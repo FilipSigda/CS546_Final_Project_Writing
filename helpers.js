@@ -1,6 +1,6 @@
 import {ObjectId} from 'mongodb';
 
-const checkId = async (id, varName) => {
+const checkId = (id, varName) => {
     if (!id) throw `Error: You must provide a ${varName}`;
     if (typeof id !== 'string') throw `Error:${varName} must be a string`;
     id = id.trim();
@@ -10,7 +10,19 @@ const checkId = async (id, varName) => {
     return id;
 }
 
-const checkString = async (strVal, varName) => {
+const checkNull = (input, varName) => {
+    if(input === null){
+        throw new Error(`${varName} is null`);
+    }
+}
+
+const checkUndef = (input,varName) => {
+    if(input === undefined){
+        throw new Error("variable is undefined");
+    }
+}
+
+const checkString = (strVal, varName) => {
     if (!strVal) throw `Error: You must supply a ${varName}!`;
     if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
     strVal = strVal.trim();
@@ -19,4 +31,13 @@ const checkString = async (strVal, varName) => {
     return strVal;
 }
 
-export {checkId, checkString}
+const checkNumber = (input,varName) => {
+    checkNull(input,varName);
+    checkUndef(input,varName);
+    if(!(typeof input === "number")){
+        throw new Error(`${varName} is not a number`);
+    }
+}
+
+
+export default {checkId, checkString,checkNumber,checkUndef,checkNull}
