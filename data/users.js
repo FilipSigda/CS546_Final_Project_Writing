@@ -1,6 +1,6 @@
 import {users} from '../config/mongoCollections.js';
 import {ObjectId} from 'mongodb';
-import {checkId, checkString } from '../helpers.js';
+import {checkId, checkString, getDefaultImage } from '../helpers.js';
 
 //TODO
 const getAllUsers = async => {
@@ -79,13 +79,13 @@ const createUser = async (username, password, ) => {
     if(!hasNum || !hasLower || !hasUpper || !hasSpecial) throw "Error: Password must contain 1 lowercase letter, 1 uppercase letter, 1 special character, and 1 number";
 
     //TODO: ACTUALLY HASH THE PASSWORD
-    //TODO: make ProfilePicture a link to the default profile picture
     let newUser = {
         "Username": username,
         "HashedPassword": password,
         "Bio": "",
-        "ProfilePicture": "N/A",
-        "Bookmarks": []
+        "ProfilePicture": getDefaultImage(),
+        "Bookmarks": [],
+        "WritingScore": 0
     }
 
     const userCollection = await users();
