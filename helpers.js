@@ -18,20 +18,22 @@ const checkNull = (input, varName) => {
 }
 
 const checkUndef = (input, varName) => {
-    if (input === undefined) {
+    if (typeof input === "undefined") {//we're using typeof since false === undefined. This avoids that.
         throw new Error(`Error: ${varName} is undefined`);
     }
 }
 
 const checkBool = (input, varName) => {
-    checkUndef(input);
-    checkNull(input);
+    checkUndef(input,varName);
+    checkNull(input,varName);
     if (typeof input !== "boolean") {
         throw new Error(`Error: ${varName} is not boolean`);
     }
 }
 
 const checkString = (strVal, varName) => {
+    checkUndef(strVal,varName);
+    checkNull(strVal,varName); 
     if (!strVal) throw `Error: You must supply a ${varName}!`;
     if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
     strVal = strVal.trim();
@@ -55,6 +57,7 @@ const checkInt = (input, varName) => {
     if (!Number.isInteger(input)) {
         throw new Error(`Error: ${varName} is not an Integer`);
     }
+    return Number.parseInt(input);
 }
 
 //checks that it is an object
@@ -83,7 +86,7 @@ const checkArrType = (input, type, varName) => {
     }
 }
 
-const checkMDY = (input,varName) => {
+const checkMDY = (input, varName) => {
     input = checkString(input, varName);
 
     var splits = input.split("/");
@@ -93,12 +96,18 @@ const checkMDY = (input,varName) => {
     if (splits[0].length != 2 || splits[1].length != 2 || splits[2].length != 4) {
         throw new Error(`Error: ${varName} is not formatted in MM/DD/YYYY. Actual value: ${input}`);
     }
+
+    if (!isNaN(new Date(input))) {
+        var date = new Date(input);
+    } else {
+        throw new Error(`Error: Date provided "${input}" to is not a valid Date`);
+    }
     return input;
 }
 
 //parses strings in MM/DD/YYYY format
 const parseMDY = (input, varName) => {
-    
+
     input = checkString(input, varName);
 
     var splits = input.split("/");
@@ -134,10 +143,10 @@ const parseMDY = (input, varName) => {
 }
 
 const formatMDY = (date) => {
-    if(!(date instanceof Date)){
-        if(Date.isValid(date)){
+    if (!(date instanceof Date)) {
+        if (!isNaN(new Date(date))) {
             date = new Date(date);
-        }else{
+        } else {
             throw new Error(`Error: Date provided to is not a valid Date format`);
         }
     }
@@ -158,7 +167,88 @@ const formatMDY = (date) => {
     return str;
 }
 
+//format function for hour/minute/seconds
+const formatHMS = (date) => {
+    if (!(date instanceof Date)) {
+        if (!isNaN(new Date(date))) {
+            date = new Date(date);
+        } else {
+            throw new Error(`Error: Date provided to is not a valid Date format`);
+        }
+    }
+
+    var str = "";
+    if (date.getHours() < 10) {
+        str += "0" + (date.getHours());
+    } else {
+        str += (date.getHours()) + "";
+    }
+    str += ":";
+    if (date.getMinutes() < 10) {
+        str += "0" + date.getMinutes();
+    } else {
+        str += date.getMinutes() + "";
+    }
+    str += ":";
+    if(date.getSeconds() < 10) {
+        str += "0" + date.getSeconds();
+    }else{
+        str += date.getSeconds() + "";
+    }
+    return str;
+}
+
+const parseHMS = (input,varName) => {
+    input = checkString(input, varName);
+
+    var splits = input.split(":");
+    if (splits.length != 3) {
+        throw new Error(`Error: ${varName} is not formatted in HH:MM:SS. Actual value: ${input}`);
+    }
+    if (splits[0].length != 2 || splits[1].length != 2 || splits[2].length != 2) {
+        throw new Error(`Error: ${varName} is not formatted in HH:MM:SS. Actual value: ${input}`);
+    }
+
+    //convert to num
+    for (let i = 0; i < 3; i++) {
+        splits[i] = Number.parseInt(splits[i]);
+    }
+
+    //check values
+    if (splits[0] < 0 || splits[0] > 24) {
+        throw new Error(`Error: ${varName} month is out of range. ${splits[0]} is not between 1 and 12 inclusive`);
+    }
+    if (splits[1] < 0 || splits[1] > 59) {
+        throw new Error(`Error: ${varName} day is out of range. ${splits[0]} is not between 1 and 31 inclusive`);
+    }
+    if (splits[2] < 0 || splits[2] > 59) {
+        throw new Error(`Error: ${varName} year is out of range. ${splits[0]} is not between 1961 and 2100 inclusive`);
+    }
+
+    let d = new Date();
+    d.setHours(splits[0]);
+    d.setMinutes(splits[1] );
+    d.setSeconds(splits[2]);
+
+    return d;
+}
+
+const checkHMS = (input,varName) => {
+    input = checkString(input, varName);
+
+    var splits = input.split(":");
+    if (splits.length != 3) {
+        throw new Error(`Error: ${varName} is not formatted in HH:MM:SS. Actual value: ${input}`);
+    }
+    if (splits[0].length != 2 || splits[1].length != 2 || splits[2].length != 2) {
+        throw new Error(`Error: ${varName} is not formatted in HH:MM:SS. Actual value: ${input}`);
+    }
+
+    parseHMS(input,varName);
+    return input;
+}
+
 export default {
-    checkId, checkString, checkNumber, checkInt, checkUndef,
-    checkNull, checkObj, checkArr, checkArrType, checkBool, parseMDY, formatMDY, checkMDY
+    checkId, checkString, checkNumber, checkInt, checkUndef, checkNull, checkObj, checkArr, checkArrType,
+    checkBool, parseMDY, formatMDY, checkMDY, formatHMS, parseHMS, checkHMS
 }

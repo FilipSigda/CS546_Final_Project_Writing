@@ -37,7 +37,7 @@ const populateStories = async () => {
                     }
                 ],
             "DatePosted": helpers.formatMDY(Date.now()),
-            "TimePosted": "18:00:23",
+            "TimePosted": helpers.formatHMS(Date.now()),//helpers.formatHMS(Date.now())),//"18:00:23",
             "TimeLimit": -1,
             "Additions": [
                (new ObjectId()).toHexString(),
@@ -50,21 +50,21 @@ const populateStories = async () => {
             "Comments": [
                 {
                     "UserId":(new ObjectId()).toHexString(),
-                    "body": "wow what a great story! It was so good I commented!"
+                    "Body": "wow what a great story! It was so good I commented!"
                 }
             ],
             "History": [
                 {
                     "UserId":(new ObjectId()).toHexString(),
-                    "changes": [
+                    "Changes": [
                         {
-                            "text": "This sentence was added to the story",
-                            "chapter": 2,
-                            "position": 123
+                            "Text": "This sentence was added to the story",
+                            "Chapter": 2,
+                            "Position": 123
                         }
                     ],
                     "Date": "05/02/2024",
-                    "Time": "12:00"
+                    "Time": "12:00:23"
                 }
             ],
             "Views":50,
