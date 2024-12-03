@@ -11,6 +11,10 @@ const checkId = (id, varName) => {
     return id;
 }
 
+const getDefaultImage = () => {
+    return "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg?20200418092106";
+}
+
 const checkNull = (input, varName) => {
     if (input === null) {
         throw new Error(`Error: ${varName} is null`);
@@ -250,5 +254,5 @@ const checkHMS = (input,varName) => {
 
 export default {
     checkId, checkString, checkNumber, checkInt, checkUndef, checkNull, checkObj, checkArr, checkArrType,
-    checkBool, parseMDY, formatMDY, checkMDY, formatHMS, parseHMS, checkHMS
+    checkBool, parseMDY, formatMDY, checkMDY, formatHMS, parseHMS, checkHMS,getDefaultImage
 }
