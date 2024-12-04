@@ -18,3 +18,4 @@ const getCollectionFn = (collection) => {
 /* Now, you can list your collections here: */
 export const users = getCollectionFn('users');
 export const stories = getCollectionFn('stories');
+export const groups = getCollectionFn('groups');
