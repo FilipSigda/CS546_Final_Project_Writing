@@ -9,7 +9,7 @@ import users from "./data/users.js";
 
 //populates mongodb with dummy stories
 const populateStories = async () => {
-    var ret = await stories.createStory(
+    var story = await stories.createStory(
         {
             "Title": "TEST TITLE", "Body":
                 [
@@ -70,7 +70,7 @@ const populateStories = async () => {
                 }
             ],
             "Views":50,
-            "Picture":"https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg?20200418092106",
+            "Picture":helpers.getDefaultImage(),
             "Settings": {
                 "MaxParticipants": 50,
                 "AllowedParticipants": [
@@ -88,6 +88,14 @@ const populateStories = async () => {
 
         }
     );
+
+    console.log("create finished");
+
+    var ret = await stories.getAllStories();
+
+    console.log("getall finished");
+    ret = await stories.updateStory(story.insertedId.toHexString(),{Title:"Balls"});
+    console.log("update finished");
     return ret;
 }
 

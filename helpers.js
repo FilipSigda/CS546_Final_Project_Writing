@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 //checks variable for objectID
-const checkId = (id, varName) => {
+export const checkId = (id, varName) => {
     if (!id) throw `Error: You must provide a ${varName}`;
     if (typeof id !== 'string') throw `Error:${varName} must be a string`;
     id = id.trim();
@@ -11,23 +11,23 @@ const checkId = (id, varName) => {
     return id;
 }
 
-const getDefaultImage = () => {
+export const getDefaultImage = () => {
     return "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg?20200418092106";
 }
 
-const checkNull = (input, varName) => {
+export const checkNull = (input, varName) => {
     if (input === null) {
         throw new Error(`Error: ${varName} is null`);
     }
 }
 
-const checkUndef = (input, varName) => {
+export const checkUndef = (input, varName) => {
     if (typeof input === "undefined") {//we're using typeof since false === undefined. This avoids that.
         throw new Error(`Error: ${varName} is undefined`);
     }
 }
 
-const checkBool = (input, varName) => {
+export const checkBool = (input, varName) => {
     checkUndef(input,varName);
     checkNull(input,varName);
     if (typeof input !== "boolean") {
@@ -35,7 +35,7 @@ const checkBool = (input, varName) => {
     }
 }
 
-const checkString = (strVal, varName) => {
+export const checkString = (strVal, varName) => {
     checkUndef(strVal,varName);
     checkNull(strVal,varName); 
     if (!strVal) throw `Error: You must supply a ${varName}!`;
@@ -47,7 +47,7 @@ const checkString = (strVal, varName) => {
 }
 
 //checks that value is an integer
-const checkNumber = (input, varName) => {
+export const checkNumber = (input, varName) => {
     checkNull(input, varName);
     checkUndef(input, varName);
     if (!(typeof input === "number")) {
@@ -56,7 +56,7 @@ const checkNumber = (input, varName) => {
 }
 
 //checks that it is a number AND an integer
-const checkInt = (input, varName) => {
+export const checkInt = (input, varName) => {
     checkNumber(input, varName);
     if (!Number.isInteger(input)) {
         throw new Error(`Error: ${varName} is not an Integer`);
@@ -65,7 +65,7 @@ const checkInt = (input, varName) => {
 }
 
 //checks that it is an object
-const checkObj = (input, varName) => {
+export const checkObj = (input, varName) => {
     checkNull(input, varName);
     checkUndef(input, varName);
     if (!(typeof input === "object")) {
@@ -73,7 +73,7 @@ const checkObj = (input, varName) => {
     }
 }
 
-const checkArr = (input, varName) => {
+export const checkArr = (input, varName) => {
     checkObj(input, varName);
     if (!Array.isArray(input)) {
         throw new Error(`Error: ${varName} is not an Array`);
@@ -81,7 +81,7 @@ const checkArr = (input, varName) => {
 }
 
 //checks that every element is the correct type
-const checkArrType = (input, type, varName) => {
+export const checkArrType = (input, type, varName) => {
     checkArr(input, varName);
     for (let i = 0; i < input.length; i++) {
         if (typeof input[i] !== type) {
@@ -90,7 +90,7 @@ const checkArrType = (input, type, varName) => {
     }
 }
 
-const checkMDY = (input, varName) => {
+export const checkMDY = (input, varName) => {
     input = checkString(input, varName);
 
     var splits = input.split("/");
@@ -110,7 +110,7 @@ const checkMDY = (input, varName) => {
 }
 
 //parses strings in MM/DD/YYYY format
-const parseMDY = (input, varName) => {
+export const parseMDY = (input, varName) => {
 
     input = checkString(input, varName);
 
@@ -146,7 +146,7 @@ const parseMDY = (input, varName) => {
     return d;
 }
 
-const formatMDY = (date) => {
+export const formatMDY = (date) => {
     if (!(date instanceof Date)) {
         if (!isNaN(new Date(date))) {
             date = new Date(date);
@@ -172,7 +172,7 @@ const formatMDY = (date) => {
 }
 
 //format function for hour/minute/seconds
-const formatHMS = (date) => {
+export const formatHMS = (date) => {
     if (!(date instanceof Date)) {
         if (!isNaN(new Date(date))) {
             date = new Date(date);
@@ -202,7 +202,7 @@ const formatHMS = (date) => {
     return str;
 }
 
-const parseHMS = (input,varName) => {
+export const parseHMS = (input,varName) => {
     input = checkString(input, varName);
 
     var splits = input.split(":");
@@ -237,7 +237,7 @@ const parseHMS = (input,varName) => {
     return d;
 }
 
-const checkHMS = (input,varName) => {
+export const checkHMS = (input,varName) => {
     input = checkString(input, varName);
 
     var splits = input.split(":");
