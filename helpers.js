@@ -1,13 +1,11 @@
 import { ObjectId } from 'mongodb';
 
 //checks variable for objectID
-export const checkId = (id, varName) => {
-    if (!id) throw `Error: You must provide a ${varName}`;
-    if (typeof id !== 'string') throw `Error:${varName} must be a string`;
-    id = id.trim();
-    if (id.length === 0)
-        throw `Error: ${varName} cannot be an empty string or just spaces`;
-    if (!ObjectId.isValid(id)) throw `Error: ${varName} invalid object ID`;
+export const checkId = (id, varName, allowEmpty=false) => {
+    checkNull(id,varName);
+    checkUndef(id,varName);
+    id = checkString(id,varName,allowEmpty);
+    if (!ObjectId.isValid(id)) throw new Error( `Error: ${varName} invalid object ID`);
     return id;
 }
 
@@ -35,14 +33,13 @@ export const checkBool = (input, varName) => {
     }
 }
 
-export const checkString = (strVal, varName) => {
+export const checkString = (strVal, varName, allowEmpty=false) => {
     checkUndef(strVal,varName);
     checkNull(strVal,varName); 
-    if (!strVal) throw `Error: You must supply a ${varName}!`;
-    if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
+    if (typeof strVal !== 'string') throw new Error(`Error: ${varName} must be a string!`);
     strVal = strVal.trim();
-    if (strVal.length === 0)
-        throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+    if (strVal.length === 0 && !allowEmpty)
+        throw new Error(`Error: ${varName} is empty when it shouldn't be`);
     return strVal;
 }
 

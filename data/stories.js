@@ -4,8 +4,8 @@ import helpers from '../helpers.js';
 
 const checkBody = (obj) => {
     helpers.checkObj(obj);
-    obj.Title = helpers.checkString(obj.Title, "obj.body[].Title");
-    obj.Text = helpers.checkString(obj.Text, "obj.body.Text");
+    obj.Title = helpers.checkString(obj.Title, "obj.body[].Title", true);
+    obj.Text = helpers.checkString(obj.Text, "obj.body.Text", true);
 }
 
 const checkTag = (str) => {
@@ -94,8 +94,9 @@ const checkStoryObj = (obj, requireAllKeys = false) => {
         helpers.checkArrType(obj.Body, "object", "Body");
         checkBody.apply(null, obj.Body); //checks body for every array element
     }
-    if (obj.Description != undefined || requireAllKeys) { obj.Description = helpers.checkString(obj.Description, "Description"); }
+    if (obj.Description != undefined || requireAllKeys) { obj.Description = helpers.checkString(obj.Description, "Description", true); }
     if (obj.AuthorId != undefined || requireAllKeys) { obj.AuthorId = helpers.checkId(obj.AuthorId, "AuthorId"); }
+    if (obj.GroupId != undefined || requireAllKeys) { obj.GroupId = helpers.checkString(obj.GroupId, "GroupId", true); if (obj.GroupId.length > 0) { obj.GroupId = helpers.checkId(obj.GroupId) } }
 
     if (obj.Previous != undefined || requireAllKeys) {
         obj.Previous = helpers.checkString(obj.Previous, "Previous");
@@ -108,11 +109,15 @@ const checkStoryObj = (obj, requireAllKeys = false) => {
     }
     if (obj.Tags != undefined || requireAllKeys) {
         helpers.checkArr(obj.Tags, "Tags");
-        checkTag.apply(null, obj.Tags);
+        if (obj.Tags.length > 0) {
+            checkTag.apply(null, obj.Tags);
+        }
     }
     if (obj.Ratings != undefined || requireAllKeys) {
         helpers.checkArr(obj.Ratings, "Ratings");
-        checkRating.apply(null, obj.Ratings);
+        if (obj.Ratings.length > 0) {
+            checkRating.apply(null, obj.Ratings);
+        }
     }
     if (obj.DatePosted != undefined || requireAllKeys) {
         obj.DatePosted = helpers.checkMDY(obj.DatePosted, "DatePosted");
@@ -125,7 +130,9 @@ const checkStoryObj = (obj, requireAllKeys = false) => {
     }
     if (obj.Additions != undefined || requireAllKeys) {
         helpers.checkArr(obj.Additions, "Additions");
-        checkAdditions.apply(null, obj.Additions);
+        if (obj.Additions.length > 0) {
+            checkAdditions.apply(null, obj.Additions);
+        }
     }
     if (obj.Status != undefined || requireAllKeys) { checkStatus(obj.Status); }
     if (typeof obj.IsPrivate !== "undefined" || requireAllKeys) {
@@ -139,11 +146,15 @@ const checkStoryObj = (obj, requireAllKeys = false) => {
     }
     if (obj.Comments != undefined || requireAllKeys) {
         helpers.checkArr(obj.Comments, "Comments");
-        checkComment.apply(null, obj.Comments);
+        if (obj.Comments.length > 0) {
+            checkComment.apply(null, obj.Comments);
+        }
     }
     if (obj.History != undefined || requireAllKeys) {
         helpers.checkArr(obj.History, "History");
-        checkHistory.apply(null, obj.History);
+        if (obj.History.length > 0) {
+            checkHistory.apply(null, obj.History);
+        }
     }
     if (obj.Views != undefined || requireAllKeys) {
         obj.Views = helpers.checkInt(obj.Views);
@@ -159,20 +170,21 @@ const checkStoryObj = (obj, requireAllKeys = false) => {
 };
 
 const defaultStoryObj = {
-    "Title": "", 
+    "Title": "Untitled",
     "Body":
         [
             {
-                "Title": "",
+                "Title": "Chapter",
                 "Text": ""
             }
         ],
     "Description": "",
     "AuthorId": "",
+    "GroupId": "",
     "Previous": "n/a",
     "IsAnonymous": false,
     "Tags": [],
-    "Ratings":[],
+    "Ratings": [],
     "DatePosted": helpers.formatMDY(Date.now()),
     "TimePosted": helpers.formatHMS(Date.now()),
     "TimeLimit": -1,
@@ -202,8 +214,11 @@ const defaultStoryObj = {
 
 };
 
-const createDefaultStory = async(obj) => {
-    
+//creates a story using the starting template for a blank new story
+const createDefaultStory = async (AuthorId) => {
+    var temp = defaultStoryObj;
+    temp.AuthorId = AuthorId;
+    return await createStory(temp);
 }
 
 const createStory = async (obj) => {
@@ -270,4 +285,4 @@ const deleteStory = async (id) => {
 };
 
 
-export default { createStory, getStoryById, getAllStories, updateStory, deleteStory };
+export default { createStory, getStoryById, getAllStories, updateStory, deleteStory, createDefaultStory };

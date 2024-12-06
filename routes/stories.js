@@ -14,7 +14,7 @@ router.route("/")
             if(typeof e === "string"){
                 res.status(500).json(e);
             }else{
-                res.status(500).json({error:e.message});
+                res.status(500).json({error: e.message});
             }
         }
     });
