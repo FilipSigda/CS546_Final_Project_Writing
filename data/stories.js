@@ -285,4 +285,144 @@ const deleteStory = async (id) => {
 };
 
 
-export default { createStory, getStoryById, getAllStories, updateStory, deleteStory, createDefaultStory };
+
+import { stories } from '../config/mongoCollections.js';
+import { ObjectId } from 'mongodb';
+import helpers from '../helpers.js';
+
+const searchStories = async (searchParams) => {
+    // validate/prep search params
+    const query = {};
+    const excludeQuery = {};
+
+    // title search
+    if (searchParams.name) {
+        query.Title = { $regex: searchParams.name, $options: 'i' };
+    }
+    if (searchParams.excludeName) {
+        excludeQuery.Title = { $not: { $regex: searchParams.excludeName, $options: 'i' } };
+    }
+
+    // date range search
+    if (searchParams.startDate || searchParams.endDate) {
+        query.DatePosted = {};
+        if (searchParams.startDate) {
+            query.DatePosted.$gte = helpers.formatMDY(new Date(searchParams.startDate));
+        }
+        if (searchParams.endDate) {
+            query.DatePosted.$lte = helpers.formatMDY(new Date(searchParams.endDate));
+        }
+    }
+
+    // completion status
+    if (searchParams.status) {
+        query.Status = searchParams.status;
+    }
+    if (searchParams.excludeStatus) {
+        excludeQuery.Status = { $ne: searchParams.excludeStatus };
+    }
+
+    // story rating by min/max
+    if (searchParams.minRating || searchParams.maxRating) {
+        query.$expr = {};
+        if (searchParams.minRating) {
+            query.$expr.$gte = [
+                { $avg: "$Ratings.Score" }, 
+                searchParams.minRating
+            ];
+        }
+        if (searchParams.maxRating) {
+            query.$expr.$lte = [
+                { $avg: "$Ratings.Score" }, 
+                searchParams.maxRating
+            ];
+        }
+    }
+
+    // min. number of ratings
+    if (searchParams.minRatingCount) {
+        query.$expr = query.$expr || {};
+        query.$expr.$gte = [
+            { $size: "$Ratings" }, 
+            searchParams.minRatingCount
+        ];
+    }
+
+    // group exclusiveness
+    if (searchParams.groupExclusive !== undefined) {
+        query.GroupId = searchParams.groupExclusive ? { $ne: "" } : "";
+    }
+
+    // tags (+ exclude option)
+    if (searchParams.tags && searchParams.tags.length > 0) {
+        query.Tags = { $all: searchParams.tags };
+    }
+    if (searchParams.excludeTags && searchParams.excludeTags.length > 0) {
+        excludeQuery.Tags = { $nin: searchParams.excludeTags };
+    }
+
+    // length (based on total words)
+    if (searchParams.minLength || searchParams.maxLength) {
+        query.$expr = query.$expr || {};
+        const bodyLengthCalculation = { 
+            $reduce: { 
+                input: "$Body", 
+                initialValue: 0, 
+                in: { $add: [
+                    "$$value", 
+                    { $size: { $split: ["$$this.Text", " "] } }
+                ]}
+            }
+        };
+
+        if (searchParams.minLength) {
+            query.$expr.$gte = [bodyLengthCalculation, searchParams.minLength];
+        }
+        if (searchParams.maxLength) {
+            query.$expr.$lte = [bodyLengthCalculation, searchParams.maxLength];
+        }
+    }
+
+    // story pictures and descriptions
+    if (searchParams.hasPicture !== undefined) {
+        query.Picture = searchParams.hasPicture 
+            ? { $ne: helpers.getDefaultImage() } 
+            : helpers.getDefaultImage();
+    }
+    if (searchParams.descriptionKeyword) {
+        query.Description = { 
+            $regex: searchParams.descriptionKeyword, 
+            $options: 'i' 
+        };
+    }
+
+    // merging the exclude queries together
+    Object.keys(excludeQuery).forEach(key => {
+        query[key] = { ...query[key], ...excludeQuery[key] };
+    });
+
+    // search page number calculations
+    const page = searchParams.page || 1;
+    const limit = searchParams.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // doing the actual search
+    const db = await stories();
+    const searchResults = await db.find(query)
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+
+    // gets total results for finding search 
+    const totalCount = await db.countDocuments(query);
+
+    return {
+        stories: searchResults,
+        totalCount,
+        page,
+        totalPages: Math.ceil(totalCount / limit)
+    };
+};
+
+
+export default { createStory, getStoryById, getAllStories, updateStory, deleteStory, createDefaultStory, searchStories};
