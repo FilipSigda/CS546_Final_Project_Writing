@@ -1,0 +1,35 @@
+<h2>Sign Up</h2>
+
+<form id="signup-form" name="signup-form" method="post" action="/signupuser">
+    <label for="username">Enter Your Username<br></label>
+    <input type="text" name="username" id="username"><br>
+
+    <label for="password">Enter Your Password<br></label>
+    <input type="password" name="password" id="password"> <br>
+
+    <label for="confirmPassword">Confirm Your Password<br></label>
+    <input type="password" name="confirmPassword" id="confirmPassword"><br>
+
+    <button type="submit" name="submitButton" id="submitButton">Submit</button>
+</form>
+
+{{!-- I am a missing error passed down from Server-side JS!--}}
+{{#if missing}}
+    <div id="serverMissing" class="error">
+        <p>The following fields are left empty:</p>
+        <ul>
+        {{#each missing}}
+            <li>{{this}}</li>
+        {{/each}}
+        </ul>
+    </div>
+{{/if}}
+
+{{!--I am an error passed down from Server-Side JS !--}}
+{{#if error}}
+    <div id="serverError" class="error">{{error}}</div>
+{{/if}}
+
+<div id="clientError" class="error" hidden>I'm an error passed down through Client-Side JS.</div>
+
+<a href="/signinuser">Already have an account? Click here to sign-in</a>
