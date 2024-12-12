@@ -23,6 +23,19 @@ app.use(rewriteUnsupportedBrowserMethods);
 app.engine('handlebars',exphbs.engine({defaultLayout:'main'}));
 app.set('view engine','handlebars');
 
+//Creates Session for logged in users
+app.use(session({
+
+    name: 'AuthenticationState',
+  
+    secret: 'some secret string!',
+  
+    resave: false,
+  
+    saveUninitialized: false
+  
+  }))
+
 configRoutes(app);
 
 app.listen(3000,() =>{

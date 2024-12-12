@@ -1,18 +1,31 @@
 import {users} from '../config/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import {checkId, checkString, getDefaultImage } from '../helpers.js';
+import bcrypt from 'bcrypt';
 
-//TODO
-const getAllUsers = async => {
-    return;
+//TODO: test if works
+const getAllUsers = async () => {
+    const userCollection = await users();
+
+    const userList = await userCollection.find({ }, {projection: {"HashedPassword":false}} ).toArray();
+    if(!userList) throw new Error("Error: Could not get all Users");
+    userList = userList.map((element) => {
+        element._id = element._id.toString();
+        for (let x of element.Bookmarks){
+            x = x.toString();
+        }
+        return element;
+    });
+    return userList;
 }
 
+//Returns user with matching id WITHOUT PASSWORD
 const getUserById = async (id) => {
     id = await checkId(id, "id");
     
     const userCollection = await users();
-    const user = await userCollection.findOne({_id: new ObjectId(id)});
-    if (user === null) throw "No user with that id.";
+    const user = await userCollection.findOne({_id: new ObjectId(id)}, {projection: {"HashedPassword":false}});
+    if (user === null) throw new Error ("No user with that id.");
     user._id = user._id.toString();
     for (let x of user.Bookmarks){
       x = x.toString()
@@ -21,13 +34,13 @@ const getUserById = async (id) => {
     return user;
 }
 
-//returns user with that name, returns null if no user exists.
+//returns user with that name WITHOUT PASSWORD!!!
 const getUserByName = async (name) => {
     name = await checkString(name, "name");
     
     const userCollection = await users();
-    const user = await userCollection.findOne({Username: { $regex: "(?i)" + name + "(?-i)"}});
-    if (user === null) return null;
+    const user = await userCollection.findOne({Username: { $regex: "(?i)" + name + "(?-i)"}}, {projection: {"HashedPassword":false}});
+    if (user === null) return new Error ("No user with that name");
     user._id = user._id.toString();
     for (let x of user.Bookmarks){
       x = x.toString()
@@ -38,27 +51,28 @@ const getUserByName = async (name) => {
 //When Creating a new account, users will be prompted with a name, a password, and to reconfirm their password
 //Usernames are a minimum of 3 chars, max of 32 chars, cannot contain spaces or any characters that aren't letters, numbers or "_"
 //Passwords are a minimum of 8 characters, max of 64, cannot contain spaces, and must have 1 lowercase letter, 1 uppercase letter, 1 special character, and 1 number.
-//Returns User as an object
+//Returns username and password.
 const createUser = async (username, password, ) => {    
-    await checkString(username, "username");
-    if(username.includes(" ")) throw "Error: Username cannot contain spaces!";
+    checkString(username, "username");
+    if(username.includes(" ")) throw new Error ("Error: Username cannot contain spaces!");
     for (let x of username){
         let y = x.charCodeAt(0);
-        if (((y >= 0) && (y < 48)) || ((y > 57) && (y < 65)) || ((y > 90) && (y < 97)) || (y > 122) ) throw "Error: Username can only contain letters, numbers, or underscores"
+        if (((y >= 0) && (y < 48)) || ((y > 57) && (y < 65)) || ((y > 90) && (y < 97)) || (y > 122) ) throw new Error("Error: Username can only contain letters, numbers, or underscores")
     }
 
     //Checks if name exists (case insensitive)
-    let existingUser = await getUserByName(username);
-    if (existingUser !== null) throw 'Error: Username is taken';
-    if(username.length < 3) throw "Error: Username is too short (must be above 3 characters)!";
-    if(username.length > 32) throw "Error: Username is too long (must be below 32 characters)!";
+    const userCollection = await users();
+    const existingUser = await userCollection.findOne({Username: { $regex: "(?i)" + username + "(?-i)"}}, {projection: {"HashedPassword":false}});
+    if (existingUser !== null) throw new Error ('Error: Username is taken');
+    if(username.length < 3) throw new Error ("Error: Username is too short (must be above 3 characters)!");
+    if(username.length > 32) throw new Error("Error: Username is too long (must be below 32 characters)!");
 
     //validates password
-    await checkString(password, "password");
-    if(username.includes(" ")) throw "Error: Password cannot contain spaces!";
+    checkString(password, "password");
+    if(password.includes(" ")) throw new Error ("Error: Password cannot contain spaces!");
 
-    if(username.length < 8) throw "Error: Password is too short (must be above 8 characters)!";
-    if(username.length > 64) throw "Error: Password is too long (must be below 64 characters)!";
+    if(password.length < 8) throw new Error ("Error: Password is too short (must be above 8 characters)!");
+    if(password.length > 64) throw new Error ("Error: Password is too long (must be below 64 characters)!");
 
     let hasNum = false;
     let hasLower = false;
@@ -76,34 +90,101 @@ const createUser = async (username, password, ) => {
         if(((y > 32) && (y < 48)) || ((y > 57) && (y < 65)) || ((y > 90) && (y < 97)) || (y > 122)) hasSpecial = true;
     }
 
-    if(!hasNum || !hasLower || !hasUpper || !hasSpecial) throw "Error: Password must contain 1 lowercase letter, 1 uppercase letter, 1 special character, and 1 number";
+    if(!hasNum || !hasLower || !hasUpper || !hasSpecial) throw new Error("Error: Password must contain 1 lowercase letter, 1 uppercase letter, 1 special character, and 1 number");
 
-    //TODO: ACTUALLY HASH THE PASSWORD
+    let hashedPassword = await bcrypt.hash(password, 16); 
+
     let newUser = {
         "Username": username,
-        "HashedPassword": password,
+        "HashedPassword": hashedPassword,
         "Bio": "",
         "ProfilePicture": getDefaultImage(),
         "Bookmarks": [],
         "WritingScore": 0
     }
 
-    const userCollection = await users();
     const insertInfo = await userCollection.insertOne(newUser);
 
     if (!insertInfo.acknowledged || !insertInfo.insertedId){
-        throw "could not add user";
+        throw new Error ("could not add user");
     }
 
     const newId = insertInfo.insertedId.toString();
-
     const user = await getUserById(newId);
+
     return user;
+}
+
+//TODO: test
+const signInUser = async(username, password) =>{
+    //validate Username
+    try{
+        checkString(username, "username");
+    } catch {
+        throw new Error ("Either Username or Password is Invalid.")
+    }
+
+    if(username.includes(" ")) throw new Error ("Either Username or Password is Invalid.");
+    for (let x of username){
+        let y = x.charCodeAt(0);
+        if (((y >= 0) && (y < 48)) || ((y > 57) && (y < 65)) || ((y > 90) && (y < 97)) || (y > 122) ) throw new Error ("Either Username or Password is Invalid.");
+    }
+    if(username.length < 3) throw new Error ("Either Username or Password is Invalid.");
+    if(username.length > 32) throw new Error("Either Username or Password is Invalid.");
+
+    //Validate Password
+    try{
+        checkString(password, "password");
+    } catch {
+        throw new Error("Either Username or Password is Invalid.");
+    }
+    if(password.includes(" ")) throw new Error ("Error: Password cannot contain spaces!");
+
+    if(password.length < 8) throw new Error ("Either Username or Password is Invalid.");
+    if(password.length > 64) throw new Error ("Either Username or Password is Invalid.");
+
+    let hasNum = false;
+    let hasLower = false;
+    let hasUpper = false;
+    let hasSpecial = false;
+    
+    for(let x of password){
+        let y = x.charCodeAt(0);
+        if((y > 47) && (y < 58)) hasNum = true;
+
+        if((y > 96) && (y < 123)) hasLower = true;
+
+        if((y > 64) && (y < 91)) hasUpper = true;
+
+        if(((y > 32) && (y < 48)) || ((y > 57) && (y < 65)) || ((y > 90) && (y < 97)) || (y > 122)) hasSpecial = true;
+    }
+
+    if(!hasNum || !hasLower || !hasUpper || !hasSpecial) throw new Error("Either Username or Password is Invalid.");
+
+    const userCollection = await users();
+    const user = await userCollection.findOne({Username: { $regex: "(?i)" + username + "(?-i)"}});
+    if(user === null) throw "Either the Username or password is invalid";
+
+    let comparePassword = false;
+
+    try{
+        comparePassword = await bcrypt.compare(password, user.password);
+    } catch (e){}
+
+    if(!comparePassword) throw "Either the Username or Password is invalid";
+
+    for(let x of user.Bookmarks){
+        x = x.toString();
+    }
+
+    return {_id: user._id.toString(), username: user.username, Bio: user.Bio, ProfilePicture: user.ProfilePicture, Bookmarks: user.Bookmarks, WritingScore: user.WritingScore}
 }
 
 //TODO
 const deleteUser = async(id) => {
+
+
     return;
 }
 
-export default {getAllUsers, getUserById, getUserByName, createUser, deleteUser}
+export default {getAllUsers, getUserById, getUserByName, createUser, deleteUser, signInUser}
