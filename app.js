@@ -1,6 +1,7 @@
 import express from 'express';
 import configRoutes from './routes/index.js';
 import exphbs from 'express-handlebars';
+import session from 'express-session';
 
 //copied from lab 8. Might have to rework depending on our requirements
 const rewriteUnsupportedBrowserMethods = (req, res, next) => {

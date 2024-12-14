@@ -1,0 +1,122 @@
+
+  <h1>Home</h1>
+
+  <form action="/" method="GET" id="searchBar" class="storySearch">
+    <h5>Search for Stories</h5>
+    <br>
+    <label>
+      Story Name
+      <input name="search" id="searchName" type="search">
+    </label>
+    <br>
+    <label>
+      Start Date
+      <input name="search" id="searchStartDate" type="date">
+    </label>
+    <br>
+    <label>
+      End Date
+      <input name="search" id="searchEndDate" type="date">
+    </label>
+    <br>
+    <label>
+      Completion Status
+      <select name="search" id="searchStatus">
+        <option value="">Any</option>
+        <option value="Ongoing">Ongoing</option>
+        <option value="Complete">Complete</option>
+        <option value="Dropped">Dropped</option>
+      </select>
+    </label>
+    <br>
+    <label>
+      Exclude Status
+      <select name="search" id="searchExcludeStatus">
+        <option value="">None</option>
+        <option value="Ongoing">Ongoing</option>
+        <option value="Complete">Complete</option>
+        <option value="Dropped">Dropped</option>
+      </select>
+    </label>
+    <br>
+    <label>
+      Maximum Rating
+      <input name="search" id="searchMaxRating" type="number" step="0.5" min="0" max="5">
+    </label>
+    <br>
+    <label>
+      Minimum Rating
+      <input name="search" id="searchMinRating" type="number" step="0.5" min="0" max="5">
+    </label>
+    <br>
+    <label>
+      Maximum Reviews
+      <input name="search" id="searchMaxReviews" type="search">
+    </label>
+    <br>
+    <label>
+      Minimum Reviews
+      <input name="search" id="searchMinReviews" type="search">
+    </label>
+    <br>
+    <label>
+      Maximum Character Count
+      <input name="search" id="searchMaxChar" type="search">
+    </label>
+    <br>
+    <label>
+      Minimum Character Count
+      <input name="search" id="searchMinChar" type="search">
+    </label>
+    <br>
+    <label>
+      Group Association
+      <select name="search" id="searchAssociation">
+        <option value="">Any</option>
+        <option value="Group">Group</option>
+        <option value="Individual">Individual</option>
+      </select>
+    </label>
+    <br>
+    <label>
+      Tags (Seperate By Commas)
+      <input name="search" id="searchTags" type="search">
+    </label>
+    <br>
+    <label>
+      Exclude Tags
+      <input name="search" id="searchExcludeTags" type="search">
+    </label>
+  <br>
+    <button>Submit</button>
+
+  </form>
+<br>
+
+ 
+
+  <main>
+    <h4>Results:</h4>
+    {{#if resultsList}}
+    <ul>
+      {{#each resultsList}}
+        <li>
+          <a href="/storiesTODO:{{storyLink}}">
+            <h5>{{storyTitle}}</h5>
+            <h6>{{authors}}</h6>
+            <p>
+              {{description}}
+            </p>
+          </a>
+        </li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <p>
+      No results found.
+    </p>
+    {{/if}}
+  </main>
+
+
+<!--sort init stories by views-->

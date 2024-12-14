@@ -1,5 +1,5 @@
 import { Router } from "express";
-import userData from '../data/user.js';
+import userData from '../data/users.js';
 import { checkString } from "../helpers.js";
 
 

@@ -285,11 +285,6 @@ const deleteStory = async (id) => {
 };
 
 
-
-import { stories } from '../config/mongoCollections.js';
-import { ObjectId } from 'mongodb';
-import helpers from '../helpers.js';
-
 const searchStories = async (searchParams) => {
     // validate/prep search params
     const query = {};

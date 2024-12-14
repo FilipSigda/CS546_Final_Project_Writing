@@ -1,0 +1,27 @@
+<main>
+    <h4>Pending Invites</h4>
+    {{#if pendingInvites}}
+    <ul>
+        {{#each pendingInvites}}
+        <li>
+            //FixToAccept/Deny<a href="/groups/:{{groupId}}">{{groupName}}</a>
+        </li>
+        {{/each}}
+    </ul>
+    {{else}}
+    <p>No invites.</p>
+    {{/if}}
+
+    <h4>Joined Groups</h4>
+    {{#if joinedGroups}}
+    <ul>
+        {{#each joinedGroups}}
+        <li>
+            <a href="/groups/:{{groupId}}">{{groupName}}</a>
+        </li>
+        {{/each}}
+    </ul>
+    {{else}}
+    <p>None joined.</p>
+    {{/if}}
+</main>
