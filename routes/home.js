@@ -6,7 +6,7 @@ const router = Router();
 //Opens the homepage.
 router.route("/")
 .get(async (req,res) => {
-    try {
+    /*try {
         // converting to proper types
         const searchParams = {
             // Name 
@@ -61,7 +61,7 @@ router.route("/")
         } else {
             res.status(500).json({ error: 'An unexpected error occurred during story search.' });
         }
-    }
+    }*/
     res.render("../views/homepage", {title: "Homepage"});
 });
 
@@ -69,7 +69,7 @@ export default router;
 
 
 
-
+/*
 .get(async (req, res) => {
     try {
         // converting to proper types
@@ -127,4 +127,4 @@ export default router;
             res.status(500).json({ error: 'An unexpected error occurred during story search.' });
         }
     }
-});
+});*/
