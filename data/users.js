@@ -52,7 +52,7 @@ const getUserByName = async (name) => {
 //Usernames are a minimum of 3 chars, max of 32 chars, cannot contain spaces or any characters that aren't letters, numbers or "_"
 //Passwords are a minimum of 8 characters, max of 64, cannot contain spaces, and must have 1 lowercase letter, 1 uppercase letter, 1 special character, and 1 number.
 //Returns username and password.
-const createUser = async (username, password, ) => {    
+const createUser = async (username, password) => {    
     checkString(username, "username");
     if(username.includes(" ")) throw new Error ("Error: Username cannot contain spaces!");
     for (let x of username){
@@ -106,7 +106,7 @@ const createUser = async (username, password, ) => {
     const insertInfo = await userCollection.insertOne(newUser);
 
     if (!insertInfo.acknowledged || !insertInfo.insertedId){
-        throw new Error ("could not add user");
+        throw new Error ("Internal Server Error");
     }
 
     const newId = insertInfo.insertedId.toString();

@@ -19,7 +19,33 @@ router
 })
 //TODO: Takes and validates form input. Then signs them up and redirects to the user profile once finished.
 .post(async (req, res) => {
+    let missing = [];
+    
+    if(!req.body["user_name"]) missing.push("Username");
+    if(!req.body["password"]) missing.push("Password");
 
+    if(missing.length > 0){
+        res.status(400).render('../views/signupuser', {title: "Sign Up", missing: missing});
+        return;
+    }
+
+    let user = null;
+
+    try {
+        user = await userData.createUser(req.body["user_name"], req.body["password"]);
+    } catch (e){
+        if(e.message === "Internal Server Error"){
+            res.status(500).render('../views/signupuser', {title: "Sign Up", error: e.message});
+            return;
+        }else {
+            res.status(400).render('../views/signupuser', {title: "Sign Up", error: e.message});
+            return;
+        }
+    }
+
+    req.session.user = user;
+
+    res.redirect('/' + user._id)
 })
 
 //Sign in User Route
@@ -30,25 +56,49 @@ router
 })
 //TODO: Takes and validates form input. redirects to user profile once finished.
 .post(async (req, res) => {
+    let missing = [];
     
+    if(!req.body["user_name"]) missing.push("Username");
+    if(!req.body["password"]) missing.push("Password");
+
+    if(missing.length > 0){
+        res.status(400).render('../views/signupuser', {title: "Sign Up", missing: missing});
+        return;
+    }
+
+    let user = null;
+
+    try {
+        user = await userData.signInUser(req.body["user_name"], req.body["password"]);
+    } catch (e){
+        res.status(400).render('../views/signupuser', {title: "Sign Up", error: e.message});
+    }
+
+    if (user === null){
+        res.status().render('../views/signupuser', {title: "Sign Up", error: "Either the Username or Password is invalid"});
+    }
+
+    req.session.user = user;
+
+    res.redirect('/' + user._id)
 })
 
 //TEST: Displays the profile of the given user
 router
-.route("/:username")
+.route("/:id")
 .get(async (req, res)=>{
-    let username = req.params.username;
+    let id = req.params.id;
     let user;
 
     try{
-        username = checkString(username, "Username", false);
+        id = checkId(id, "Id", false);
     } catch(e){
-        res.status(400).render("../views/user", {title: username, notFound: e.message});
+        res.status(400).render("../views/user", {title: id, notFound: e.message});
         return;
     }
 
     try{
-        user = await userData.getUserByName(username);
+        user = await userData.getUserById(id);
     } catch (e) {
         res.status(404).render("../views/user", {title: user.Username, notFound: e.message});
         return;
