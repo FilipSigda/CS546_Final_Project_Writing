@@ -58,11 +58,11 @@ router
 .post(async (req, res) => {
     let missing = [];
     
-    if(!req.body["user_name"]) missing.push("Username");
+    if(!req.body["username"]) missing.push("Username");
     if(!req.body["password"]) missing.push("Password");
 
     if(missing.length > 0){
-        res.status(400).render('../views/signupuser', {title: "Sign Up", missing: missing});
+        res.status(400).render('../views/signinuser', {title: "Sign In", missing: missing});
         return;
     }
 
@@ -71,11 +71,13 @@ router
     try {
         user = await userData.signInUser(req.body["user_name"], req.body["password"]);
     } catch (e){
-        res.status(400).render('../views/signupuser', {title: "Sign Up", error: e.message});
+        res.status(400).render('../views/signinuser', {title: "Sign In", error: e.message});
+        return;
     }
 
     if (user === null){
-        res.status().render('../views/signupuser', {title: "Sign Up", error: "Either the Username or Password is invalid"});
+        res.status().render('../views/signinuser', {title: "Sign In", error: "Either the Username or Password is invalid"});
+        return;
     }
 
     req.session.user = user;
