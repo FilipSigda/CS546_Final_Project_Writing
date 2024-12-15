@@ -1,29 +1,26 @@
 import { Router } from "express";
-import data from "../data/stories.js";
 import debug from "../debug.js";
+import storyData from "../data/stories.js";
+import groupData from "../data/groups.js";
+import userData from "../data/users.js";
+import helpers from "../helpers.js";
 
 const router = Router();
 
 router.route("/")
-    .get(async (req, res) => {
+    //post should be used for creating stories
+    .post(async (req, res) => {
         try {
-            console.log("CREATED STORY");
-            var createdObj = await debug.populateStories();
-            res.status(200).json(createdObj);
+            var id = req.params.id;
+            helpers.checkString(id);
+
         } catch (e) {
-            if(typeof e === "string"){
-                res.status(500).json(e);
-            }else{
-                res.status(500).json({error: e.message});
-            }
+            res.status(400).json({ error: e.message });
         }
     });
 
-    import { Router } from "express";
-    import storyData from "../data/stories.js";
-    
-    
-    router.route("/search")
+
+router.route("/search")
     .get(async (req, res) => {
         try {
             // converting to proper types
@@ -68,7 +65,7 @@ router.route("/")
             };
 
             // Remove undefined values
-            Object.keys(searchParams).forEach(key => 
+            Object.keys(searchParams).forEach(key =>
                 searchParams[key] === undefined && delete searchParams[key]
             );
 
@@ -84,6 +81,54 @@ router.route("/")
     });
 
 
+router.route('/:id')
+    .get(async (req, res) => {
+        try {
+            //story read page TODO: make pretty and use handlebars
+            var story = await storyData.getStoryById(req.params.id);
 
-    
+            console.log(req.session);
+
+            var authorlist = [story.AuthorId];
+            // if(story.GroupId){
+            //     var group = await groupData.getGroupById();
+            //     console.log(group);
+            // }
+            var authorhtml = "";
+            for(let i=0;i<authorlist.length;i++){
+                var authorobj = await userData.getUserById(authorlist[i]);
+                authorhtml += `<a href='/users/${authorobj._id}'>${authorobj.Username}</a>`
+                if(i<authorlist.length - 1){
+                    authorhtml += ', ';
+                }
+            }
+
+            var chapterhtml = "";
+            for(let i=0;i<story.Body.length;i++){
+                chapterhtml += `<li><h2 id="${'ch'+i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</h2></li>`;
+            }
+            //console.log(story);
+
+            res.render("readstory",{
+                title: story.Title,
+                authors:authorhtml,
+                imglink:story.Picture,
+                description:story.description,
+                chapters:chapterhtml
+            });
+        } catch (e) {
+            res.status(400).json({ error: e.message });
+        }
+    })
+    //this will be mainly used for updating subdocuments like comments and ratings
+    .patch(async (req,res) => {
+        try{
+            var story = await storyData.updateStory(req.params.id,req.body);
+            res.status(200).json(story); // REPLACE WITH RENDER
+        }catch(e){
+            res.status(400).json({error: e.message});
+        }
+    });
+
+
 export default router;

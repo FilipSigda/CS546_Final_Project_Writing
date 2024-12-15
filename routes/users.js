@@ -1,5 +1,5 @@
 import { Router } from "express";
-import userData from '../data/user.js';
+import userData from '../data/users.js';
 import { checkString } from "../helpers.js";
 
 
@@ -30,8 +30,7 @@ router
 })
 //TODO: Takes and validates form input. redirects to user profile once finished.
 .post(async (req, res) => {
-
-
+    
 })
 
 //TEST: Displays the profile of the given user

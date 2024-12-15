@@ -1,6 +1,9 @@
 import express from 'express';
 import configRoutes from './routes/index.js';
 import exphbs from 'express-handlebars';
+import session from 'express-session';
+import debug from './debug.js';
+import users from './data/users.js';
 
 //copied from lab 8. Might have to rework depending on our requirements
 const rewriteUnsupportedBrowserMethods = (req, res, next) => {
@@ -34,7 +37,7 @@ app.use(session({
   
     saveUninitialized: false
   
-  }))
+  }));
 
 configRoutes(app);
 
