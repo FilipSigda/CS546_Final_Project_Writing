@@ -1,9 +1,12 @@
+<h2>Groups</h2>
+
 <main>
     <h4>Pending Invites</h4>
     {{#if pendingInvites}}
     <ul>
         {{#each pendingInvites}}
         <li>
+            <label>{{groupName}}</label>
             //FixToAccept/Deny<a href="/groups/:{{groupId}}">{{groupName}}</a>
         </li>
         {{/each}}
