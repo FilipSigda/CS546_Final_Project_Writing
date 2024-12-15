@@ -35,7 +35,7 @@ app.use(session({
   
     saveUninitialized: false
   
-  }))
+  }));
 
 configRoutes(app);
 

@@ -30,8 +30,7 @@ router
 })
 //TODO: Takes and validates form input. redirects to user profile once finished.
 .post(async (req, res) => {
-
-
+    
 })
 
 //TEST: Displays the profile of the given user
