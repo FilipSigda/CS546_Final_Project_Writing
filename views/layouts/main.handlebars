@@ -5,6 +5,20 @@
     <meta charset="utf-8">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/public/css/stories.css">
+
+    <nav>
+      <a href="/">Home</a>
+      {{#if signedIn}}
+      <div id="profileLink">
+        <a href="/">{{name}}</a>
+        <img class="profilePicture" alt="Profile Picture of {{name}}" src={{profilePicture}}>
+      </div>
+      {{else}}
+      <div id="signInLink">
+        <a href="/users/signinuser">Sign in</a>
+      </div>
+      {{/if}}
+    </nav>
 </head>
 
 <body>
