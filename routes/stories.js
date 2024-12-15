@@ -107,7 +107,6 @@ router.route('/:id')
             for(let i=0;i<story.Body.length;i++){
                 chapterhtml += `<li><h2 id="${'ch'+i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</h2></li>`;
             }
-            //console.log(story);
 
             res.render("readstory",{
                 title: story.Title,
