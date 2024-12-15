@@ -20,8 +20,8 @@ const checkRating = (obj) => {
 
 const checkComment = (obj) => {
     helpers.checkObj(obj);
-    obj.UserId = helpers.checkString(obj.UserId, "Comment");
-    obj.Body = helpers.checkString(obj.Body, "Comment");
+    obj.UserId = helpers.checkId(obj.UserId, "Comments.UserId");
+    obj.Body = helpers.checkString(obj.Body, "Comment.Body");
 }
 
 //check changes within history
@@ -199,12 +199,8 @@ const defaultStoryObj = {
     "Picture": helpers.getDefaultImage(),
     "Settings": {
         "MaxParticipants": 99999,
-        "AllowedParticipants": [
-            (new ObjectId()).toHexString()
-        ],
-        "AllowedGroups": [
-            (new ObjectId()).toHexString()
-        ],
+        "AllowedParticipants": [],
+        "AllowedGroups": [],
         "MaxSentences": 99999,
         "MinWords": 0,
         "MaxWords": 999999,
@@ -225,7 +221,19 @@ const createStory = async (obj) => {
     obj = checkStoryObj(obj, true);
 
     var db = await stories();
+    var prevstory = null;
+    try{
+    if(obj.Previous != "n/a"){
+        prevstory = await getStoryById(obj.Previous);
+    }}catch(e){
+        throw new Error("Previous story does not exist");
+    }
     var story = await db.insertOne(obj);
+
+    if(prevstory != null){
+        prevstory.Additions.append(story._id); 
+        await updateStory(prevstory._id,{Additions:prevstory.Additions});
+    }
 
     if (!story.acknowledged) {
         throw new Error("Story failed to save");
@@ -283,12 +291,6 @@ const deleteStory = async (id) => {
 
     return story;
 };
-
-
-
-import { stories } from '../config/mongoCollections.js';
-import { ObjectId } from 'mongodb';
-import helpers from '../helpers.js';
 
 const searchStories = async (searchParams) => {
     // validate/prep search params
