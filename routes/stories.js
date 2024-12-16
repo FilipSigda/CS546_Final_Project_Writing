@@ -12,6 +12,13 @@ const renderstory = async (req,res,story,error="") => {
         res.render('readstory',{title:"Story is privated"});
     }
 
+    // gathering story rating and finding average rating
+    const averageRating = story.Ratings && story.Ratings.length > 0 
+        ? (story.Ratings.reduce((sum, rating) => sum + rating.Score, 0) / story.Ratings.length).toFixed(1)
+        : 'Unrated';
+
+    const totalRatings = story.Ratings ? story.Ratings.length : 0;
+
     var authorlist = [story.AuthorId];
     // if(story.GroupId){
     //     var group = await groupData.getGroupById();
@@ -42,7 +49,9 @@ const renderstory = async (req,res,story,error="") => {
         chapters:chapterhtml,
         urlid:req.params.id,
         loggedin:(typeof req.session.user !== "undefined"),
-        jump_links:jumplinkhtml
+        jump_links:jumplinkhtml,
+        averageRating: averageRating,
+        totalRatings: totalRatings
     });
 }
 
@@ -135,13 +144,51 @@ router.route('/:id')
     })
     //this will be mainly used for updating subdocuments like comments and ratings
     .patch(async (req,res) => {
-        try{
-            var story = await storyData.updateStory(req.params.id,req.body);
-            res.status(200).json(story); // REPLACE WITH RENDER
-        }catch(e){
+        try {
+            if (!req.session.user) {
+                return res.status(401).json({ error: "You must be logged in to rate a story" });
+            }
+
+            const userId = req.session.user._id;
+
+            var story = await storyData.updateStory(req.params.id, req.body, userId);
+            
+            // if rating was added, update the user's writing score
+            if (req.body.Ratings && req.body.Ratings.length > 0) {
+                await updateUserWritingScore(story.AuthorId);
+            }
+
+            res.status(200).json(story);
+        } catch(e) {
             res.status(400).json({error: e.message});
         }
     });
+
+// helper function to update user's writing score
+const updateUserWritingScore = async (authorId) => {
+    // get all stories by author (including group stories)
+    const authorStories = await storyData.searchStories({
+        AuthorId: authorId,
+        IsAnonymous: false
+    });
+
+    // calculate total ratings and number of stories
+    let totalRatings = 0;
+    let storyCount = 0;
+
+    authorStories.stories.forEach(story => {
+        if (story.Ratings.length > 0) {
+            totalRatings += story.Ratings.reduce((sum, rating) => sum + rating.Score, 0);
+            storyCount++;
+        }
+    });
+
+    // calculate writing score
+    const writingScore = storyCount > 0 ? totalRatings / storyCount : 0;
+
+    // update user's writing score
+    await userData.updateUserProfile(authorId, { writingScore });
+};
 
     router.route('/:id/download')
     .get(async (req, res) => {

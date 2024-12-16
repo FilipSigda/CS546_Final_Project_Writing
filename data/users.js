@@ -199,6 +199,10 @@ const updateUserProfile = async (id, updateData) => {
         updateDoc.Bio = updateData.bio;
     }
 
+    if (updateData.writingScore !== undefined) {
+        updateDoc.WritingScore = parseFloat(updateData.writingScore.toFixed(2));
+    }
+
     const updateResult = await userCollection.findOneAndUpdate(
         { _id: new ObjectId(id) },
         { $set: updateDoc },
@@ -213,7 +217,8 @@ const updateUserProfile = async (id, updateData) => {
         _id: updateResult._id.toString(),
         Username: updateResult.Username,
         Bio: updateResult.Bio,
-        ProfilePicture: updateResult.ProfilePicture
+        ProfilePicture: updateResult.ProfilePicture,
+        WritingScore: updateResult.WritingScore
     };
 }
 
