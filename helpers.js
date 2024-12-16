@@ -13,6 +13,10 @@ export const getDefaultImage = () => {
     return "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg?20200418092106";
 }
 
+export const getDefaultBio = () => {
+    return "No Bio has been set for this user."
+}
+
 export const checkNull = (input, varName) => {
     if (input === null) {
         throw new Error(`Error: ${varName} is null`);

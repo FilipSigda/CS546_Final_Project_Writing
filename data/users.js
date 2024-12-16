@@ -1,6 +1,6 @@
 import {users} from '../config/mongoCollections.js';
 import {ObjectId} from 'mongodb';
-import {checkId, checkString, getDefaultImage } from '../helpers.js';
+import {checkId, checkString, getDefaultBio, getDefaultImage } from '../helpers.js';
 import bcrypt from 'bcrypt';
 
 //TODO: test if works
@@ -97,7 +97,7 @@ const createUser = async (username, password) => {
     let newUser = {
         "Username": username,
         "HashedPassword": hashedPassword,
-        "Bio": "",
+        "Bio": getDefaultBio(),
         "ProfilePicture": getDefaultImage(),
         "Bookmarks": [],
         "WritingScore": 0

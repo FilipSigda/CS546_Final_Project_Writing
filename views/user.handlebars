@@ -1,5 +1,10 @@
+{{#if notFound}}
+    <div id="serverError" class="error">{{notFound}}</div>
+
+    <a href="/">Go back to Home</a>
+{{else}}
 <div class="user-profile">
-  <img src="{{ProfilePicture}}" alt="Profile Picture">
+  <img class="pfp" src="{{ProfilePicture}}" alt="Profile Picture">
   <h2>{{Username}}</h2>
   <p>Bio: {{Bio}}</p>
   <p>Writing Score: {{WritingScore}}</p>
@@ -26,3 +31,4 @@
     <p>No bookmarks yet.</p>
   {{/if}}
 </div>
+{{/if}}

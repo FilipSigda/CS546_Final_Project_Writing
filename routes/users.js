@@ -5,7 +5,6 @@ import { checkId } from "../helpers.js";
 
 const router = Router();
 
-//TODO: Gets a page where you can search and look at all users
 router.route("/")
 .get(async (req,res) => {
     res.status(200).json({res:"Temporary Response"});
