@@ -29,7 +29,6 @@
             password = passwordElem.val(),
             confirmPassword = confirmPasswordElem.val();
 
-        console.log(username)
         //Same Error checking as /data/users.js
         try{
             checkString(username, "username");
@@ -38,6 +37,9 @@
                 let y = x.charCodeAt(0);
                 if (((y >= 0) && (y < 48)) || ((y > 57) && (y < 65)) || ((y > 90) && (y < 97)) || (y > 122) ) throw new Error("Error: Username can only contain letters, numbers, or underscores")
             }
+
+            if(username.length < 3) throw new Error ("Error: Username is too short (must be between 3-32 characters)!");
+            if(username.length > 32) throw new Error("Error: Username is too long (must be between 3-32 characters)!");
         } catch(e){
             errors.push(e.message)
         }
@@ -95,7 +97,57 @@
     });
 
     signInForm.submit(function (event){
-        let error = $('#client-error')
+        let error = $('#clientError'),
+            user_name = $(`#user_name`),
+            passwordElem = $('#password');
+
+        error.hide();
+
+        let username = user_name.val(),
+            password = passwordElem.val();
+
+        try{
+            //Username Validation
+            checkString(username, "username");
+            if(username.includes(" ")) throw new Error("Error: Username cannot contain spaces!");
+            for (let x of username){
+                let y = x.charCodeAt(0);
+                if (((y >= 0) && (y < 48)) || ((y > 57) && (y < 65)) || ((y > 90) && (y < 97)) || (y > 122) ) throw new Error("Error: Username can only contain letters, numbers, or underscores")
+            }
+        
+            if(username.length < 3) throw new Error ("Error: Username is too short (must be between 3-32 characters)!");
+            if(username.length > 32) throw new Error("Error: Username is too long (must be between 3-32 characters)!");      
+            
+            //Pasword Validation
+            checkString(password, "password");
+            if(password.includes(" ")) throw new Error("Error: Password cannot contain spaces!");
+        
+            if(password.length < 8) throw new Error("Error: Password is too short (must be between 8-64 characters)!");
+            if(password.length > 64) throw new Error("Error: Password is too long (must be between 8-64 characters)!");
+        
+            let hasNum = false;
+            let hasLower = false;
+            let hasUpper = false;
+            let hasSpecial = false;
+            
+            for(let x of password){
+                let y = x.charCodeAt(0);
+                if((y > 47) && (y < 58)) hasNum = true;
+        
+                if((y > 96) && (y < 123)) hasLower = true;
+        
+                if((y > 64) && (y < 91)) hasUpper = true;
+        
+                if(((y > 32) && (y < 48)) || ((y > 57) && (y < 65)) || ((y > 90) && (y < 97)) || (y > 122)) hasSpecial = true;
+            }
+        
+            if(!hasNum || !hasLower || !hasUpper || !hasSpecial) throw new Error("Error: Password must contain 1 lowercase letter, 1 uppercase letter, 1 special character, and 1 number");
+        } catch {
+            event.preventDefault();
+            error.empty();
+            error.show();
+            error.text("Either the Username or Password is invalid");
+        } 
     });
 
 
