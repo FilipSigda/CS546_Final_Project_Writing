@@ -1,21 +1,44 @@
-<!--TODO-->
-<h2>{{groupName}}</h2>
+<h2>{{Name}}</h2>
 
 <main>
+    <h4>Bio</h4>
+    <p>{{Bio}}</p>
+    <br>
     <h4>Stories</h4>
+    {{#if Stories}}
     <ul>
-        {{h}}
+        {{#each Stories}}
+        <li>
+            <a href="/stories/{{Title}}">{{Title}}</a>
+        </li>
+        {{/each}}
     </ul>
-
+    {{else}}
+    <p>
+        No stories yet.
+    </p>
+    {{/if}}
+    <br>
     <h4>Members</h4>
+    {{#if Members}}
     <ul>
-        {{h}}
+        {{#each Members}}
+        <li>
+            <a href="/users/{{Username}}">{{Username}}</a>
+        </li>
+        {{/each}}
     </ul>
-
+    {{else}}
+    <p>
+        No members yet.  Somehow.
+    </p>
+    {{/if}}
+    <br>
     {{#if isOwner}}
     <h4>Invite</h4>
     <form>
-        
+        <input type="search" value="Username" id="inviteUsername">
+        <button>Invite</button>
     </form>
     {{/if}}
 
