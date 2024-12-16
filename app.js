@@ -52,6 +52,7 @@ app.use('/', (req, res, next) => {
     next();
 });
 
+//prevents signed in users from signing up again
 app.use('/users/signinuser', (req, res, next) => {
     if((req.method === "GET") && (req.originalUrl === '/users/signinuser')){
          if(!req.session.user){
@@ -64,6 +65,7 @@ app.use('/users/signinuser', (req, res, next) => {
     }
 });
 
+//Prevents signed in users from signing in again.
 app.use('/users/signupuser', (req, res, next) => {
     if((req.method === "GET") && (req.originalUrl === '/users/signupuser')){
          if(!req.session.user){
@@ -76,8 +78,9 @@ app.use('/users/signupuser', (req, res, next) => {
     }
 });
 
+//Prevents users who aren't signed in from signing out
 app.use('/users/signoutuser', (req, res, next) => {
-     if(req.originalUrl === '/signoutuser'){
+     if(req.originalUrl === '/users/signoutuser'){
           if(!req.session.user) res.redirect('/users/signinuser');
           else{
                next();
@@ -85,6 +88,16 @@ app.use('/users/signoutuser', (req, res, next) => {
      }
 });
 
+//Prevent users who aren't signed in from editing a profile
+//Prevents signed in users from editing profiles that aren't their own
+app.use('/users/editprofile/:id', (req, res, next) => {
+     if((req.method === "GET") && (req.originalUrl === '/users/editprofile/' + req.params.id)){
+          if(!req.session.user) res.redirect('/users/' + req.params.id);
+          else if(req.session.user._id === req.params.id) next();
+          else res.redirect('/users/' + req.params.id);
+
+     }
+});
 configRoutes(app);
 
 app.listen(3000,() =>{
