@@ -4,6 +4,7 @@ import storyData from "../data/stories.js";
 import groupData from "../data/groups.js";
 import userData from "../data/users.js";
 import helpers from "../helpers.js";
+import xss from 'xss';
 
 const router = Router();
 
@@ -47,8 +48,8 @@ const renderstory = async (req,res,story,error="") => {
         imglink:story.Picture,
         description:story.description,
         chapters:chapterhtml,
-        urlid:req.params.id,
-        loggedin:(typeof req.session.user !== "undefined"),
+        urlid:xss(req.params.id),
+        loggedin:(typeof xss(req.session.user) !== "undefined"),
         jump_links:jumplinkhtml,
         averageRating: averageRating,
         totalRatings: totalRatings
@@ -59,7 +60,7 @@ router.route("/")
     //post should be used for creating stories
     .post(async (req, res) => {
         try {
-            var id = req.params.id;
+            var id = xss(req.params.id);
             helpers.checkString(id);
 
         } catch (e) {
@@ -74,42 +75,42 @@ router.route("/search")
             // converting to proper types
             const searchParams = {
                 // Name 
-                name: req.query.name,
-                excludeName: req.query.excludeName,
+                name: xss(req.query.name),
+                excludeName: xss(req.query.excludeName),
 
                 // Date 
-                startDate: req.query.startDate,
-                endDate: req.query.endDate,
+                startDate: xss(req.query.startDate),
+                endDate: xss(req.query.endDate),
 
                 // Status (complete, hiatus, dropped)
-                status: req.query.status,
-                excludeStatus: req.query.excludeStatus,
+                status: xss(req.query.status),
+                excludeStatus: xss(req.query.excludeStatus),
 
                 // Ratings
-                minRating: req.query.minRating ? parseFloat(req.query.minRating) : undefined,
-                maxRating: req.query.maxRating ? parseFloat(req.query.maxRating) : undefined,
-                minRatingCount: req.query.minRatingCount ? parseInt(req.query.minRatingCount) : undefined,
+                minRating: xss(req.query.minRating) ? parseFloat(xss(req.query.minRating)) : undefined,
+                maxRating: xss(req.query.maxRating) ? parseFloat(xss(req.query.maxRating)) : undefined,
+                minRatingCount: xss(req.query.minRatingCount) ? parseInt(xss(req.query.minRatingCount)) : undefined,
 
                 // Group exclusive?
-                groupExclusive: req.query.groupExclusive === 'true',
+                groupExclusive: xss(req.query.groupExclusive) === 'true',
 
                 // Tags
-                tags: req.query.tags ? req.query.tags.split(',') : undefined,
-                excludeTags: req.query.excludeTags ? req.query.excludeTags.split(',') : undefined,
+                tags: xss(req.query.tags) ? xss(req.query.tags).split(',') : undefined,
+                excludeTags: xss(req.query.excludeTags) ? xss(req.query.excludeTags).split(',') : undefined,
 
                 // Length
-                minLength: req.query.minLength ? parseInt(req.query.minLength) : undefined,
-                maxLength: req.query.maxLength ? parseInt(req.query.maxLength) : undefined,
+                minLength: xss(req.query.minLength) ? parseInt(xss(req.query.minLength)) : undefined,
+                maxLength: xss(req.query.maxLength) ? parseInt(xss(req.query.maxLength)) : undefined,
 
                 // Picture
-                hasPicture: req.query.hasPicture === 'true',
+                hasPicture: xss(req.query.hasPicture) === 'true',
 
                 // Description
-                descriptionKeyword: req.query.descriptionKeyword,
+                descriptionKeyword: xss(req.query.descriptionKeyword),
 
                 // Paging Results
-                page: req.query.page ? parseInt(req.query.page) : 1,
-                limit: req.query.limit ? parseInt(req.query.limit) : 10
+                page: xss(req.query.page) ? parseInt(xss(req.query.page)) : 1,
+                limit: xss(req.query.limit) ? parseInt(xss(req.query.limit)) : 10
             };
 
             // Remove undefined values
@@ -133,9 +134,7 @@ router.route('/:id')
     .get(async (req, res) => {
         try {
             //story read page TODO: make pretty and use handlebars
-            var story = await storyData.getStoryById(req.params.id);
-
-            console.log(req.session);
+            var story = await storyData.getStoryById(xss(req.params.id));
 
             renderstory(req,res,story);
         } catch (e) {
@@ -145,16 +144,16 @@ router.route('/:id')
     //this will be mainly used for updating subdocuments like comments and ratings
     .patch(async (req,res) => {
         try {
-            if (!req.session.user) {
+            if (!xss(req.session.user)) {
                 return res.status(401).json({ error: "You must be logged in to rate a story" });
             }
 
-            const userId = req.session.user._id;
+            const userId = xss(req.session.user._id);
 
-            var story = await storyData.updateStory(req.params.id, req.body, userId);
+            var story = await storyData.updateStory(xss(req.params.id), xss(req.body), userId);
             
             // if rating was added, update the user's writing score
-            if (req.body.Ratings && req.body.Ratings.length > 0) {
+            if (xss(req.body.Ratings) && xss(req.body.Ratings.length) > 0) {
                 await updateUserWritingScore(story.AuthorId);
             }
 
@@ -194,7 +193,7 @@ const updateUserWritingScore = async (authorId) => {
     .get(async (req, res) => {
         try {
             
-            const story = await storyData.getStoryById(req.params.id);
+            const story = await storyData.getStoryById(xss(req.params.id));
 
             
             let fileContent = `${story.Title}\n\n`;
