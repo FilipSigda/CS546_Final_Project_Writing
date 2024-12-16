@@ -8,6 +8,9 @@
   <h2>{{Username}}</h2>
   <p>Bio: {{Bio}}</p>
   <p>Writing Score: {{WritingScore}}</p>
+  {{#if canEdit}}
+  <a href="/users/editprofile/{{_id}}">Edit Profile</a>
+  {{/if}}
 
   <h3>Writing Groups</h3>
   {{#if Groups}}

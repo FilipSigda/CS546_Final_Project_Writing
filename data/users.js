@@ -180,6 +180,44 @@ const signInUser = async(username, password) =>{
     return {_id: user._id.toString(), Username: user.Username, Bio: user.Bio, ProfilePicture: user.ProfilePicture, Bookmarks: user.Bookmarks, WritingScore: user.WritingScore}
 }
 
+const updateUserProfile = async (id, updateData) => {
+    id = await checkId(id, "id");
+    const userCollection = await users();
+
+    const updateDoc = {};
+
+    if (typeof updateData.profilePicture === 'string') {
+        updateDoc.ProfilePicture = updateData.profilePicture;
+    } else if (updateData.profilePicture !== undefined) {
+        throw new Error("Profile picture must be a valid path");
+    }
+
+    if (updateData.bio !== undefined) {
+        if (updateData.bio.length > 500) {
+            throw new Error("Bio cannot exceed 500 characters");
+        }
+        updateDoc.Bio = updateData.bio;
+    }
+
+    const updateResult = await userCollection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateDoc },
+        { returnDocument: 'after', projection: { HashedPassword: 0 } }
+    );
+
+    if (!updateResult) {
+        throw new Error("Could not update user profile");
+    }
+
+    return {
+        _id: updateResult._id.toString(),
+        Username: updateResult.Username,
+        Bio: updateResult.Bio,
+        ProfilePicture: updateResult.ProfilePicture
+    };
+}
+
+
 //TODO
 const deleteUser = async(id) => {
 
@@ -187,4 +225,4 @@ const deleteUser = async(id) => {
     return;
 }
 
-export default {getAllUsers, getUserById, getUserByName, createUser, deleteUser, signInUser}
+export default {getAllUsers, getUserById, getUserByName, createUser, deleteUser, signInUser, updateUserProfile}
