@@ -462,14 +462,14 @@ const getHighestViews = async (limit) => {
     try{//Limits query size if asked for.
         helpers.checkInt(limit);
         if(!Number.isNaN(limit)){
-            highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1}).sort({Views: -1}).limit(limit).toArray();
+            highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1, 'Picture': 1}).sort({Views: -1}).limit(limit).toArray();
         }
         else{
             throw "";//Intentionally left empty.
         }
     }
     catch(e){
-        highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1}).sort({Views: -1}).toArray();
+        highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1, 'Picture': 1}).sort({Views: -1}).toArray();
     }
 
     for(let i = 0; i < highestViews.length; i++){//Puts in the correct author(s) for each story.
@@ -486,14 +486,14 @@ const getMostRecent = async (limit) => {
     try{//Limits query size if asked for.
         helpers.checkInt(limit);
         if(!Number.isNaN(limit)){
-            mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1}).sort({DatePosted: -1, TimePosted: -1}).limit(limit).toArray();
+            mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1, 'Picture': 1}).sort({DatePosted: -1, TimePosted: -1}).limit(limit).toArray();
         }
         else{
             throw "";//Intentionally left empty.
         }
     }
     catch(e){
-        mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1}).sort({DatePosted: -1, TimePosted: -1}).toArray();
+        mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1, 'Picture': 1}).sort({DatePosted: -1, TimePosted: -1}).toArray();
     }
 
     for(let i = 0; i < mostRecent.length; i++){//Puts in the correct author(s) for each story.

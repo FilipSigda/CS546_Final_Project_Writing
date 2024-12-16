@@ -1,6 +1,6 @@
   <h2>Home</h2>
 
-  <form action="/" method="GET" id="searchBar" class="storySearch">
+  <form action="/stories/search" method="GET" id="searchBar" class="storySearch">
     <h5>Search for Stories</h5>
     <br>
     <label>
@@ -88,27 +88,27 @@
     </label>
   <br>
     <button>Submit</button>
-
   </form>
   <br>
 
   <main>
     <h4>Most Viewed:</h4>
     {{#if viewedResultsList}}
-    <ol>
+    <div class="feed">
       {{#each viewedResultsList}}
-        <li>
+        <div class="storycard">
           <a href="/stories/{{_id}}">
             <h5>{{Title}}</h5>
+            <img src="{{Picture}}">
           </a>
           <h6>By: {{Author}}</h6>
           <p>
             {{Description}}
           </p>
           <footer>Views: {{Views}}</footer>
-        </li>
+        </div>
       {{/each}}
-    </ol>
+    </div>
     {{else}}
     <p>
       No results found.
@@ -123,6 +123,7 @@
         <div class="storycard">
           <a href="/stories/{{_id}}">
             <h5>{{Title}}</h5>
+            <img src="{{Picture}}">
           </a>
           <h6>By: {{Author}}</h6>
           <p>
@@ -134,10 +135,8 @@
       {{/each}}
     </div>
     {{else}}
-    <div>
       <p>
         No results found.
       </p>
-    </div>
     {{/if}}
   </main>  
