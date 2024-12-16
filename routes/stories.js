@@ -7,6 +7,45 @@ import helpers from "../helpers.js";
 
 const router = Router();
 
+const renderstory = async (req,res,story,error="") => {
+    if(story.isPrivate){
+        res.render('readstory',{title:"Story is privated"});
+    }
+
+    var authorlist = [story.AuthorId];
+    // if(story.GroupId){
+    //     var group = await groupData.getGroupById();
+    //     console.log(group);
+    // }
+
+    var authorhtml = "";
+    for(let i=0;i<authorlist.length;i++){
+        var authorobj = await userData.getUserById(authorlist[i]);
+        authorhtml += `<a href='/users/${authorobj._id}'>${authorobj.Username}</a>`
+        if(i<authorlist.length - 1){
+            authorhtml += ', ';
+        }
+    }
+
+    var chapterhtml = "";
+    var jumplinkhtml = "";
+    for(let i=0;i<story.Body.length;i++){
+        chapterhtml += `<li><h2 id="${'ch'+i}" name="Chapter ${i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</h2></li>`;
+        jumplinkhtml += `<li><a id='${'jl'+i}' href='#${'ch'+i}'>${story.Body[i].Title}</a></li>`
+    }
+
+    res.render("readstory",{
+        title: story.Title,
+        authors:authorhtml,
+        imglink:story.Picture,
+        description:story.description,
+        chapters:chapterhtml,
+        urlid:req.params.id,
+        loggedin:(typeof req.session.user !== "undefined"),
+        jump_links:jumplinkhtml
+    });
+}
+
 router.route("/")
     //post should be used for creating stories
     .post(async (req, res) => {
@@ -83,41 +122,13 @@ router.route("/search")
 
 router.route('/:id')
     .get(async (req, res) => {
-        console.log(req.params.id);
         try {
             //story read page TODO: make pretty and use handlebars
             var story = await storyData.getStoryById(req.params.id);
 
             console.log(req.session);
 
-            var authorlist = [];// = [story.AuthorId];
-            // if(story.GroupId){
-            //     var group = await groupData.getGroupById();
-            //     console.log(group);
-            // }
-            var authorhtml = "";
-            for(let i=0;i<authorlist.length;i++){
-                var authorobj = await userData.getUserById(authorlist[i]);
-                authorhtml += `<a href='/users/${authorobj._id}'>${authorobj.Username}</a>`
-                if(i<authorlist.length - 1){
-                    authorhtml += ', ';
-                }
-            }
-
-            var chapterhtml = "";
-            for(let i=0;i<story.Body.length;i++){
-                chapterhtml += `<li><h2 id="${'ch'+i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</h2></li>`;
-            }
-
-            res.render("readstory",{
-                storyId: story._id,
-                title: story.Title,
-                authors:authorhtml,
-                imglink:story.Picture,
-                description:story.description,
-                chapters:chapterhtml,
-                url:req.params.id
-            });
+            renderstory(req,res,story);
         } catch (e) {
             res.status(400).json({ error: e.message });
         }

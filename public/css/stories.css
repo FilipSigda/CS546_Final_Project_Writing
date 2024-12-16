@@ -3,15 +3,15 @@ div.error{
     background-color: salmon;
 }
 
-.fixed {
-    position:fixed;
-}
-
 img.profilePicture{
     height: 25px;
     width: 25px;
 }
 
+.error{
+    color:red;
+    background-color: salmon;
+}
 .user-profile h2{
     display: inline;
 }
