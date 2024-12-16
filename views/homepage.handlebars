@@ -118,9 +118,9 @@
     <br>
     <h4>Most Recent:</h4>
     {{#if recentResultsList}}
-    <ol>
+    <div class="feed">
       {{#each recentResultsList}}
-        <li>
+        <div class="storycard">
           <a href="/stories/{{_id}}">
             <h5>{{Title}}</h5>
           </a>
@@ -130,12 +130,14 @@
           </p>
           <footer>Date Created: {{DatePosted}}</footer>
           <footer>Time Created: {{TimePosted}}</footer>
-        </li>
+        </div>
       {{/each}}
-    </ol>
+    </div>
     {{else}}
-    <p>
-      No results found.
-    </p>
+    <div>
+      <p>
+        No results found.
+      </p>
+    </div>
     {{/if}}
   </main>  
