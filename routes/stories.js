@@ -51,6 +51,8 @@ const renderstory = async (req,res,story,error="") => {
         urlid:xss(req.params.id),
         loggedin:(typeof xss(req.session.user) !== "undefined"),
         jump_links:jumplinkhtml,
+        previous:story.Previous,
+        loggedin:(typeof req.session.user !== "undefined"),
         averageRating: averageRating,
         totalRatings: totalRatings
     });
@@ -141,13 +143,36 @@ router.route('/:id')
             res.status(400).json({ error: e.message });
         }
     })
+    .post(async (req,res) => {
+        try{
+            if(req.session.user){
+                var user = await userData.getUserById(xss(req.session.user));
+                
+                var story = await storyData.createDefaultStory(user._id);
+                story.Previous = xss(req.params.id);
+                var sid = story._id;
+
+                delete story._id;
+                /*TODO validation if they are allowed to create an offshoot story here*/
+
+                var updated = await storyData.updateStory(sid,story);
+                console.log(updated);
+
+                res.redirect('stories/'+story._id+'/edit');
+            }else{
+                res.redirect('users/signupuser');
+            }
+
+        }catch(e){
+            res.status(400).json({error:e.message});
+        }
+    })
     //this will be mainly used for updating subdocuments like comments and ratings
     .patch(async (req,res) => {
         try {
             if (!xss(req.session.user)) {
                 return res.status(401).json({ error: "You must be logged in to rate a story" });
             }
-
             const userId = xss(req.session.user._id);
 
             var story = await storyData.updateStory(xss(req.params.id), xss(req.body), userId);
@@ -217,6 +242,16 @@ const updateUserWritingScore = async (authorId) => {
             res.send(fileContent);
         } catch (e) {
             res.status(400).json({ error: e.message });
+        }
+    });
+
+
+    router.route('/:id/edit')
+    .get(async (req,res) =>{
+        try{
+            res.status(400).json("created");
+        }catch(e){
+            res.status(400).json({error: e.message});
         }
     });
 

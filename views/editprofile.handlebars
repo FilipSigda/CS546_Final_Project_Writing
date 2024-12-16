@@ -5,7 +5,7 @@
     <div class="error-message">{{error}}</div>
   {{/if}}
   
-  <form action="/users/editprofile" method="POST" enctype="multipart/form-data">
+  <form action="/users/editprofile/{{user._id}}" method="POST" enctype="multipart/form-data">
     <div class="form-group">
       <label for="bio">Bio</label>
       <textarea id="bio" name="bio" rows="4" maxlength="500">{{user.Bio}}</textarea>

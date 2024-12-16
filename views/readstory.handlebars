@@ -1,40 +1,40 @@
-<main>
-    <article>
-        <h3 class="error">{{error}}</h3>
-        <h1>{{title}}</h1>
-        <img src="{{imglink}}">
-        <h3>{{{authors}}}</h3>
-        <p>description: {{description}}</p>
-        <div>
-            <div id="jumplinks" class="fixed">
-                Table of Contents
-                <ol>
-                    {{{jump_links}}}
-                </ol>
-            </div>
-            <div>
-                <ol>
-                    {{{chapters}}}
-                </ol>
-            </div>
+<article>
+    <h3 class="error">{{error}}</h3>
+    <h1>{{title}}</h1>
+    <img src="{{imglink}}">
+    <h3>{{{authors}}}</h3>
+    <p>description: {{description}}</p>
+    <a href="{{previous}}">previous</a>
+    <div>
+        <div id="jumplinks" class="fixed">
+            Table of Contents
+            <ol>
+                {{{jump_links}}}
+            </ol>
         </div>
-    </article>
+        <div>
+            <ol>
+                {{{chapters}}}
+            </ol>
+        </div>
+    </div>
+</article>
 
-    {{#if loggedin}}
-    <form id="createAddition" method="POST" action="/stories/{{urlid}}">
-        <input type="submit" value="Create an Addition to this story!">
-    </form>
+{{#if loggedin}}
+<form id="createAddition" method="POST" action="/stories/{{urlid}}">
+    <input type="submit" value="Create an Addition to this story!">
+</form>
 
-    <form action="/stories/ratings" method="POST" id="rate" name="rate">
-        <label>Rate The Story</label>
-        <select name="ratingsNumber" id="ratingsNumber">
-            <option value=""></option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select>
-        <input type="submit" value="rate">
-    </form>
-</main>
+<form action="/stories/{{urlid}}" method="POST" id="rate" name="rate">
+    <label for="ratingsNumber">Rate The Story</label>
+    <select name="ratingsNumber" id="ratingsNumber">
+        <option value=""></option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+    <input type="submit" value="rate">
+</form>
+{{/if}}
