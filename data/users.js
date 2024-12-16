@@ -177,7 +177,7 @@ const signInUser = async(username, password) =>{
         x = x.toString();
     }
 
-    return {_id: user._id.toString(), username: user.username, Bio: user.Bio, ProfilePicture: user.ProfilePicture, Bookmarks: user.Bookmarks, WritingScore: user.WritingScore}
+    return {_id: user._id.toString(), Username: user.Username, Bio: user.Bio, ProfilePicture: user.ProfilePicture, Bookmarks: user.Bookmarks, WritingScore: user.WritingScore}
 }
 
 //TODO

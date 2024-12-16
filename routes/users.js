@@ -85,6 +85,15 @@ router
     res.redirect('/users/' + user._id)
 })
 
+router
+.route('/signoutuser')
+.get(async (req, res) => {
+    //code here for GET
+    req.session.destroy();
+  
+    res.redirect('/');
+});
+
 //TEST: Displays the profile of the given user
 router
 .route("/:id")

@@ -6,3 +6,8 @@ div.error{
 .fixed {
     position:fixed;
 }
+
+img.profilePicture{
+    height: 25px;
+    width: 25px;
+}

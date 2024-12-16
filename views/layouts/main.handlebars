@@ -4,14 +4,18 @@
 <head>
     <meta charset="utf-8">
     <title>{{title}}</title>
-    <link rel="stories" href="/public/css/stories.css">
+    <link rel="stylesheet" href="/public/css/stories.css">
+</head>
 
+<body>
+  <header>
     <nav>
       <a href="/">Home</a>
       {{#if signedIn}}
       <div id="profileLink">
-        <a href="/">{{name}}</a>
         <img class="profilePicture" alt="Profile Picture of {{name}}" src={{profilePicture}}>
+        <a href="/users/{{id}}">{{name}}</a><br>
+        <a href="/users/signoutuser">Sign Out</a>
       </div>
       {{else}}
       <div id="signInLink">
@@ -19,9 +23,9 @@
       </div>
       {{/if}}
     </nav>
-</head>
+  </header>
 
-<body>
+
     {{{body}}}
 
     <!--<script src='/public/js/form_validate.js'></script>-->
