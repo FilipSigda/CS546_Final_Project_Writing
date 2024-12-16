@@ -1,22 +1,33 @@
 <main>
     <article>
+        <h3 class="error">{{error}}</h3>
         <h1>{{title}}</h1>
         <img src="{{imglink}}">
         <h3>{{{authors}}}</h3>
         <p>description: {{description}}</p>
-        <div id="jumplinks" class="fixed">
-            {{{jump_links}}}
-        </div>
         <div>
-            <ol>
-                {{{chapters}}}
-            </ol>
+            <div id="jumplinks" class="fixed">
+                Table of Contents
+                <ol>
+                    {{{jump_links}}}
+                </ol>
+            </div>
+            <div>
+                <ol>
+                    {{{chapters}}}
+                </ol>
+            </div>
         </div>
     </article>
 
-    <form action="/stories/ratings" method="POST" id="ratings">
+    {{#if loggedin}}
+    <form id="createAddition" method="POST" action="/stories/{{urlid}}">
+        <input type="submit" value="Create an Addition to this story!">
+    </form>
+
+    <form action="/stories/ratings" method="POST" id="rate" name="rate">
         <label>Rate The Story</label>
-        <select name="search" id="ratingsNumber">
+        <select name="ratingsNumber" id="ratingsNumber">
             <option value=""></option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -24,9 +35,6 @@
             <option value="4">4</option>
             <option value="5">5</option>
         </select>
-        <button>Submit</button>
+        <input type="submit" value="rate">
     </form>
-    <div>
-        <a href="/stories/{{storyId}}/download" class="download-btn">Download Story</a>
-    </div>
 </main>

@@ -14,9 +14,19 @@ const checkTag = (str) => {
 
 const checkRating = (obj) => {
     helpers.checkObj(obj);
-    obj.UserId = helpers.checkString(obj.UserId, "Rating");
-    helpers.checkInt(obj.Score);
-}
+    obj.UserId = helpers.checkId(obj.UserId, "Rating");
+    
+    // validate rating score is between 0 and 10
+    const score = helpers.checkNumber(obj.Score, "Rating Score");
+    if (score < 0 || score > 10) {
+        throw new Error("Rating score must be between 0 and 10");
+    }
+};
+
+// checking if user has rated story
+const hasUserRatedStory = (story, userId) => {
+    return story.Ratings.some(rating => rating.UserId === userId);
+};
 
 const checkComment = (obj) => {
     helpers.checkObj(obj);
@@ -259,10 +269,28 @@ const getAllStories = async () => {
     return story;
 };
 
-const updateStory = async (id, obj) => {
-
+const updateStory = async (id, obj, userId = null) => {
     id = helpers.checkId(id, "id");
     helpers.checkObj(obj, "updateobj");
+
+    // handling ratings
+    if (obj.Ratings) {
+        const story = await getStoryById(id);
+        
+        // check for rating update
+        if (obj.Ratings.length > 0) {
+            const newRating = obj.Ratings[0];
+            
+            // validate rating
+            checkRating(newRating);
+
+            // check if user has already rated this story
+            if (hasUserRatedStory(story, newRating.UserId)) {
+                throw new Error("You can only rate a story once");
+            }
+        }
+    }
+
     obj = checkStoryObj(obj, false);
 
     var db = await stories();
@@ -278,6 +306,7 @@ const updateStory = async (id, obj) => {
 
     return story;
 };
+
 
 const deleteStory = async (id) => {
     id = helpers.checkId(id);
