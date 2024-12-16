@@ -64,15 +64,15 @@ const createUser = async (username, password) => {
     const userCollection = await users();
     const existingUser = await userCollection.findOne({Username: { $regex: "(?i)" + username + "(?-i)"}}, {projection: {"HashedPassword":false}});
     if (existingUser !== null) throw new Error ('Error: Username is taken');
-    if(username.length < 3) throw new Error ("Error: Username is too short (must be above 3 characters)!");
-    if(username.length > 32) throw new Error("Error: Username is too long (must be below 32 characters)!");
+    if(username.length < 3) throw new Error ("Error: Username is too short (must be between 3-32 characters)!");
+    if(username.length > 32) throw new Error("Error: Username is too long (must be between 3-32 characters)!");
 
     //validates password
     checkString(password, "password");
     if(password.includes(" ")) throw new Error ("Error: Password cannot contain spaces!");
 
-    if(password.length < 8) throw new Error ("Error: Password is too short (must be above 8 characters)!");
-    if(password.length > 64) throw new Error ("Error: Password is too long (must be below 64 characters)!");
+    if(password.length < 8) throw new Error ("Error: Password is too short (must be between 8-64 characters)!");
+    if(password.length > 64) throw new Error ("Error: Password is too long (must be between 8-64 characters)!");
 
     let hasNum = false;
     let hasLower = false;
@@ -168,7 +168,7 @@ const signInUser = async(username, password) =>{
     let comparePassword = false;
 
     try{
-        comparePassword = await bcrypt.compare(password, user.password);
+        comparePassword = await bcrypt.compare(password, user.HashedPassword);
     } catch (e){}
 
     if(!comparePassword) throw "Either the Username or Password is invalid";
