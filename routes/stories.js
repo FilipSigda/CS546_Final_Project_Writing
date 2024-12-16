@@ -114,7 +114,8 @@ router.route('/:id')
                 authors:authorhtml,
                 imglink:story.Picture,
                 description:story.description,
-                chapters:chapterhtml
+                chapters:chapterhtml,
+                url:req.params.id
             });
         } catch (e) {
             res.status(400).json({ error: e.message });
