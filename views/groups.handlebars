@@ -3,12 +3,12 @@
 <main>
     <h4>Pending Invites</h4>
     {{#if pendingInvites}}
-    <ul>
+    <ul id="pendingInvites">
         {{#each pendingInvites}}
         <li>
             <label>{{groupName}}</label>
-            <form>
-                <selection id="inviteGroup{{groupName}}">
+            <form id="inviteGroup{{groupName}}">
+                <selection>
                     <option value=""></option>
                     <option value="accept">Accept</option>
                     <option value="deny">Deny</option>

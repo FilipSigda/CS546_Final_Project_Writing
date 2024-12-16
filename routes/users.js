@@ -4,6 +4,7 @@ import { checkId } from "../helpers.js";
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import xss from 'xss';
 
 
 const router = Router();
@@ -23,8 +24,8 @@ router
 .post(async (req, res) => {
     let missing = [];
     
-    if(!req.body["username"]) missing.push("Username");
-    if(!req.body["password"]) missing.push("Password");
+    if(!xss(req.body["username"])) missing.push("Username");
+    if(!xss(req.body["password"])) missing.push("Password");
 
     if(missing.length > 0){
         res.status(400).render('../views/signupuser', {title: "Sign Up", missing: missing});
@@ -34,7 +35,7 @@ router
     let user = null;
 
     try {
-        user = await userData.createUser(req.body["username"], req.body["password"]);
+        user = await userData.createUser(xss(req.body["username"]), xss(req.body["password"]));
     } catch (e){
         if(e.message === "Internal Server Error"){
             res.status(500).render('../views/signupuser', {title: "Sign Up", error: e.message});
@@ -60,8 +61,8 @@ router
 .post(async (req, res) => {
     let missing = [];
     
-    if(!req.body["user_name"]) missing.push("Username");
-    if(!req.body["password"]) missing.push("Password");
+    if(!xss(req.body["user_name"])) missing.push("Username");
+    if(!xss(req.body["password"])) missing.push("Password");
 
     if(missing.length > 0){
         res.status(400).render('../views/signinuser', {title: "Sign In", missing: missing});
@@ -71,7 +72,7 @@ router
     let user = null;
 
     try {
-        user = await userData.signInUser(req.body["user_name"], req.body["password"]);
+        user = await userData.signInUser(xss(req.body["user_name"]), xss(req.body["password"]));
     } catch (e){
         res.status(400).render('../views/signinuser', {title: "Sign In", error: e.message});
         return;
@@ -100,7 +101,7 @@ router
 router
 .route("/:id")
 .get(async (req, res)=>{
-    let id = req.params.id;
+    let id = xss(req.params.id);
     let user;
 
     try{
@@ -118,7 +119,7 @@ router
     }
 
     // add a flag to check if the logged-in user is viewing their own profile
-    const canEdit = req.session.user && req.session.user._id === id;
+    const canEdit = xss(req.session.user) && xss(req.session.user._id) === id;
 
     res.render("../views/user", {
         title: user.Username, 
@@ -176,12 +177,12 @@ router
 .route("/editprofile/:id")
 .get(async (req, res) => {
     // Ensure user is logged in
-    if (!req.session.user) {
+    if (!xss(req.session.user)) {
         return res.redirect('/users/signinuser');
     }
 
     // Ensure user can only edit their own profile
-    if (req.params.id !== req.session.user._id) {
+    if (xss(req.params.id) !== xss(req.session.user._id)) {
         return res.status(403).render('error', {
             title: "Unauthorized",
             message: "You are not authorized to edit this profile"
@@ -189,7 +190,7 @@ router
     }
     
     try {
-        const user = await userData.getUserById(req.params.id);
+        const user = await userData.getUserById(xss(req.params.id));
         res.render('../views/editprofile', {
             title: "Edit Profile", 
             user: user
@@ -203,12 +204,12 @@ router
 })
 .post(upload.single('profilePicture'), async (req, res) => {
     // Ensure user is logged in
-    if (!req.session.user) {
+    if (!xss(req.session.user)) {
         return res.redirect('/users/signinuser');
     }
 
     // Ensure user can only edit their own profile
-    if (req.params.id !== req.session.user._id) {
+    if (xss(req.params.id) !== xss(req.session.user._id)) {
         return res.status(403).render('error', {
             title: "Unauthorized",
             message: "You are not authorized to edit this profile"
@@ -217,24 +218,24 @@ router
 
     try {
         const updateData = {
-            bio: req.body.bio
+            bio: xss(req.body.bio)
         };
 
         // profile picture upload
-        if (req.file) {
+        if (xss(req.file)) {
             // constructs path
-            updateData.profilePicture = `/uploads/profile-pictures/${req.file.filename}`;
+            updateData.profilePicture = `/uploads/profile-pictures/${xss(req.file.filename)}`;
         }
 
-        const updatedUser = await userData.updateUserProfile(req.params.id, updateData);
+        const updatedUser = await userData.updateUserProfile(xss(req.params.id), updateData);
 
         req.session.user = updatedUser;
         res.redirect('/users/' + updatedUser._id);
     } catch (e) {
         // if update fails, delete the uploaded file and render the editprofile page again with an error message
-        if (req.file) {
+        if (xss(req.file)) {
             try {
-                fs.unlinkSync(req.file.path);
+                fs.unlinkSync(xss(req.file.path));
             } catch (unlinkError) {
                 console.error('Error removing uploaded file:', unlinkError);
             }
@@ -243,7 +244,7 @@ router
         res.status(400).render('../views/editprofile', {
             title: "Edit Profile", 
             error: e.message,
-            user: req.session.user
+            user: xss(req.session.user)
         });
     }
 });
