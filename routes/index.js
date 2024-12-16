@@ -10,7 +10,6 @@ const constructorMethod = (app) => {
     app.use("/groups",groups);
 
     app.use('*',(req,res) => {
-        //res.status(301).redirect("/");
         res.status(404).json({error:"Route not found"});
     });
 }

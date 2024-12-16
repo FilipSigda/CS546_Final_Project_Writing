@@ -16,7 +16,7 @@ router.route("/")
     // POST to create a new group
     .post(async (req, res) => {
         try {
-            const { name, bio, members, stories } = req.body;
+            const { name, bio, members, stories } = xss(req.body);
             
             // defaults to empty arrays if members or stories not provided
             const newGroup = await groups.createGroup(
@@ -36,7 +36,7 @@ router.route("/")
 router.route("/:id")
     .get(async (req, res) => {
         try {
-            const group = await groups.getGroupById(req.params.id);
+            const group = await groups.getGroupById(xss(req.params.id));
             res.status(200).json(group);
         } catch (e) {
             if (e === "No group with that id.") {
@@ -49,7 +49,7 @@ router.route("/:id")
     // PUT to update a group
     .put(async (req, res) => {
         try {
-            const updatedGroup = await groups.updateGroup(req.params.id, req.body);
+            const updatedGroup = await groups.updateGroup(xss(req.params.id), xss(req.body));
             res.status(200).json(updatedGroup);
         } catch (e) {
             res.status(400).json({ error: e.message || "Error updating group" });
@@ -58,7 +58,7 @@ router.route("/:id")
     // DELETE a group
     .delete(async (req, res) => {
         try {
-            const result = await groups.deleteGroup(req.params.id);
+            const result = await groups.deleteGroup(xss(req.params.id));
             res.status(200).json(result);
         } catch (e) {
             res.status(400).json({ error: e.message || "Error deleting group" });
@@ -69,7 +69,7 @@ router.route("/:id")
 router.route("/name/:name")
     .get(async (req, res) => {
         try {
-            const group = await groups.getGroupByName(req.params.name);
+            const group = await groups.getGroupByName(xss(req.params.name));
             if (group === null) {
                 return res.status(404).json({ error: "No group found with that name" });
             }
