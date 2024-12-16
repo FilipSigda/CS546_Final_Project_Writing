@@ -426,5 +426,52 @@ const searchStories = async (searchParams) => {
     };
 };
 
+const getHighestViews = async (limit) => {
+    const db = await stories();
+    let highestViews;
 
-export default { createStory, getStoryById, getAllStories, updateStory, deleteStory, createDefaultStory, searchStories};
+    try{//Limits query size if asked for.
+        helpers.checkInt(limit);
+        if(!Number.isNaN(limit)){
+            highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1}).sort({Views: -1}).limit(limit).toArray();
+        }
+        else{
+            throw "";//Intentionally left empty.
+        }
+    }
+    catch(e){
+        highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1}).sort({Views: -1}).toArray();
+    }
+
+    for(let i = 0; i < highestViews.length; i++){//Puts in the correct author(s) for each story.
+        highestViews[i]['Author'] = helpers.getAuthor(highestViews[i]);
+    }
+
+    return highestViews;
+};
+
+const getMostRecent = async (limit) => {
+    const db = await stories();
+    let mostRecent;
+
+    try{//Limits query size if asked for.
+        helpers.checkInt(limit);
+        if(!Number.isNaN(limit)){
+            mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1}).sort({DatePosted: -1, TimePosted: -1}).limit(limit).toArray();
+        }
+        else{
+            throw "";//Intentionally left empty.
+        }
+    }
+    catch(e){
+        mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1}).sort({DatePosted: -1, TimePosted: -1}).toArray();
+    }
+
+    for(let i = 0; i < mostRecent.length; i++){//Puts in the correct author(s) for each story.
+        mostRecent[i]['Author'] = helpers.getAuthor(mostRecent[i]);
+    }
+
+    return mostRecent;
+};
+
+export default { createStory, getStoryById, getAllStories, updateStory, deleteStory, createDefaultStory, searchStories, getHighestViews, getMostRecent};

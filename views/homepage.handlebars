@@ -90,32 +90,57 @@
     <button>Submit</button>
 
   </form>
-<br>
+  <br>
 
  
+//div sort horiz
+//homepage feed
+//invites
 
   <main>
-    <h4>Results:</h4>
-    {{#if resultsList}}
-    <ul>
-      {{#each resultsList}}
+    <h4>Most Viewed:</h4>
+    {{#if viewedResultsList}}
+    <ol>
+      {{#each viewedResultsList}}
         <li>
-          <a href="/storiesTODO:{{storyLink}}">
-            <h5>{{storyTitle}}</h5>
-            <h6>{{authors}}</h6>
-            <p>
-              {{description}}
-            </p>
+          <a href="/stories/{{_id}}">
+            <h5>{{Title}}</h5>
           </a>
+          <h6>By: {{Author}}</h6>
+          <p>
+            {{Description}}
+          </p>
+          <footer>Views: {{Views}}</footer>
         </li>
       {{/each}}
-    </ul>
+    </ol>
     {{else}}
     <p>
       No results found.
     </p>
     {{/if}}
-  </main>
-
-
-<!--sort init stories by views-->
+    <br>
+    <br>
+    <h4>Most Recent:</h4>
+    {{#if recentResultsList}}
+    <ol>
+      {{#each recentResultsList}}
+        <li>
+          <a href="/stories/{{_id}}">
+            <h5>{{Title}}</h5>
+          </a>
+          <h6>By: {{Author}}</h6>
+          <p>
+            {{Description}}
+          </p>
+          <footer>Date Created: {{DatePosted}}</footer>
+          <footer>Time Created: {{TimePosted}}</footer>
+        </li>
+      {{/each}}
+    </ol>
+    {{else}}
+    <p>
+      No results found.
+    </p>
+    {{/if}}
+  </main>  

@@ -249,7 +249,20 @@ export const checkHMS = (input,varName) => {
     return input;
 }
 
+//Takes a story object and returns what the author(s) are.
+//Returns either the author(s), anonymous, or null depending on what is supplied in the object.
+export const getAuthor = (story) => {
+    if(story.IsAnonymous){
+        return "anonymous";
+    }
+    if(story.IsPrivate){
+        return null;
+    }
+
+    return "TBD";
+}
+
 export default {
     checkId, checkString, checkNumber, checkInt, checkUndef, checkNull, checkObj, checkArr, checkArrType,
-    checkBool, parseMDY, formatMDY, checkMDY, formatHMS, parseHMS, checkHMS,getDefaultImage
+    checkBool, parseMDY, formatMDY, checkMDY, formatHMS, parseHMS, checkHMS,getDefaultImage, getAuthor
 }

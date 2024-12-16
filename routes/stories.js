@@ -83,13 +83,14 @@ router.route("/search")
 
 router.route('/:id')
     .get(async (req, res) => {
+        console.log(req.params.id);
         try {
             //story read page TODO: make pretty and use handlebars
             var story = await storyData.getStoryById(req.params.id);
 
             console.log(req.session);
 
-            var authorlist = [story.AuthorId];
+            var authorlist = [];// = [story.AuthorId];
             // if(story.GroupId){
             //     var group = await groupData.getGroupById();
             //     console.log(group);

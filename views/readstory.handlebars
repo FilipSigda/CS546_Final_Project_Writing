@@ -1,14 +1,29 @@
-<article>
-    <h1>{{title}}</h1>
-    <img src="{{imglink}}">
-    <h3>{{{authors}}}</h3>
-    <p>description: {{description}}</p>
-    <div id="jumplinks" class="fixed">
-        {{{jump_links}}}
-    </div>
-    <div>
-        <ol>
-            {{{chapters}}}
-        </ol>
-    </div>
-</article>
+<main>
+    <article>
+        <h1>{{title}}</h1>
+        <img src="{{imglink}}">
+        <h3>{{{authors}}}</h3>
+        <p>description: {{description}}</p>
+        <div id="jumplinks" class="fixed">
+            {{{jump_links}}}
+        </div>
+        <div>
+            <ol>
+                {{{chapters}}}
+            </ol>
+        </div>
+    </article>
+
+    <form action="/stories/ratings" method="POST" id="ratings">
+        <label>Rate The Story</label>
+        <select name="search" id="ratingsNumber">
+            <option value=""></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <button>Submit</button>
+    </form>
+</main>
