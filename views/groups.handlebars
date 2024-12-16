@@ -1,4 +1,3 @@
-<!--TODO-->
 <h2>Groups</h2>
 
 <main>
@@ -8,7 +7,14 @@
         {{#each pendingInvites}}
         <li>
             <label>{{groupName}}</label>
-            //FixToAccept/Deny<a href="/groups/:{{groupId}}">{{groupName}}</a>
+            <form>
+                <selection id="inviteGroup{{groupName}}">
+                    <option value=""></option>
+                    <option value="accept">Accept</option>
+                    <option value="deny">Deny</option>
+                </selection>
+                <button>Submit</button>
+            </form>
         </li>
         {{/each}}
     </ul>
@@ -21,7 +27,7 @@
     <ul>
         {{#each joinedGroups}}
         <li>
-            <a href="/groups/:{{groupId}}">{{groupName}}</a>
+            <a href="/groups/{{groupId}}">{{groupName}}</a>
         </li>
         {{/each}}
     </ul>

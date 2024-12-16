@@ -53,7 +53,7 @@ app.use('/', (req, res, next) => {
 });
 
 app.use('/users/signinuser', (req, res, next) => {
-    if((req.originalUrl === '/users/signinuser')){
+    if((req.method === "GET") && (req.originalUrl === '/users/signinuser')){
          if(!req.session.user){
               next();
          } else{
@@ -65,7 +65,7 @@ app.use('/users/signinuser', (req, res, next) => {
 });
 
 app.use('/users/signupuser', (req, res, next) => {
-    if((req.originalUrl === '/users/signupuser')){
+    if((req.method === "GET") && (req.originalUrl === '/users/signupuser')){
          if(!req.session.user){
               next();
          } else{
@@ -74,6 +74,15 @@ app.use('/users/signupuser', (req, res, next) => {
     } else{
          next();
     }
+});
+
+app.use('/users/signoutuser', (req, res, next) => {
+     if(req.originalUrl === '/signoutuser'){
+          if(!req.session.user) res.redirect('/users/signinuser');
+          else{
+               next();
+          }
+     }
 });
 
 configRoutes(app);

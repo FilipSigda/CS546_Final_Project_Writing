@@ -19,3 +19,4 @@ const getCollectionFn = (collection) => {
 export const users = getCollectionFn('users');
 export const stories = getCollectionFn('stories');
 export const groups = getCollectionFn('groups');
+export const invites = getCollectionFn('invites');

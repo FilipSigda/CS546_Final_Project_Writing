@@ -1,8 +1,37 @@
 {{#if notFound}}
     <div id="serverError" class="error">{{notFound}}</div>
 
-    <a href="/users">Go back to searching for users</a>
+    <a href="/">Go back to Home</a>
 {{else}}
-    <!-- TODO -->
-    <p>This is a test</p>
+<div class="user-profile">
+  <img class="pfp" src="{{ProfilePicture}}" alt="Profile Picture">
+  <h2>{{Username}}</h2>
+  <p>Bio: {{Bio}}</p>
+  <p>Writing Score: {{WritingScore}}</p>
+  {{#if canEdit}}
+  <a href="/users/editprofile/{{_id}}">Edit Profile</a>
+  {{/if}}
+
+  <h3>Writing Groups</h3>
+  {{#if Groups}}
+    <ul>
+      {{#each Groups}}
+        <li>{{Name}} - {{Bio}}</li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>Not a member of any writing groups yet.</p>
+  {{/if}}
+
+  <h3>Bookmarks</h3>
+  {{#if Bookmarks}}
+    <ul>
+      {{#each Bookmarks}}
+        <li>{{this}}</li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>No bookmarks yet.</p>
+  {{/if}}
+</div>
 {{/if}}

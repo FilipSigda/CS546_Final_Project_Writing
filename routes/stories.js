@@ -110,6 +110,7 @@ router.route('/:id')
             }
 
             res.render("readstory",{
+                storyId: story._id,
                 title: story.Title,
                 authors:authorhtml,
                 imglink:story.Picture,
@@ -131,5 +132,35 @@ router.route('/:id')
         }
     });
 
+    router.route('/:id/download')
+    .get(async (req, res) => {
+        try {
+            
+            const story = await storyData.getStoryById(req.params.id);
+
+            
+            let fileContent = `${story.Title}\n\n`;
+            
+            
+            if (story.Description) {
+                fileContent += `Description: ${story.Description}\n\n`;
+            }
+
+            
+            story.Body.forEach((chapter, index) => {
+                fileContent += `Chapter ${index + 1}: ${chapter.Title}\n\n`;
+                fileContent += `${chapter.Text}\n\n`;
+            });
+
+            
+            res.setHeader('Content-Type', 'text/plain');
+            res.setHeader('Content-Disposition', `attachment; filename="${story.Title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt"`);
+            
+            
+            res.send(fileContent);
+        } catch (e) {
+            res.status(400).json({ error: e.message });
+        }
+    });
 
 export default router;
