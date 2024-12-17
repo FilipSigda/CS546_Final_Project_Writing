@@ -62,8 +62,15 @@ router.route("/")
     //post should be used for creating stories
     .post(async (req, res) => {
         try {
-            var id = xss(req.params.id);
-            helpers.checkString(id);
+            if(req.session.user){
+                var user = await userData.getUserById(req.session.user._id);
+
+                var story = await storyData.createDefaultStory(user._id);
+                story = await storyData.getStoryById(story.insertedId.toString());
+
+                res.redirect('/stories/'+story._id+'/edit');
+            }
+            res.redirect('/users/signupuser');
 
         } catch (e) {
             res.status(400).json({ error: e.message });
@@ -269,7 +276,7 @@ const updateUserWritingScore = async (authorId) => {
                 var group = await groupData.getGroupById(story.GroupId);
                 console.log(group);
                 for(let i=0;i<group.length;i++){
-                    //
+                    //todo
                 }
             }
             var authorhtml = "";
@@ -283,12 +290,14 @@ const updateUserWritingScore = async (authorId) => {
             var chapterhtml = "";
             var jumplinkhtml = "";
             for (let i = 0; i < story.Body.length; i++) {
-                chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><input type="text" id="${'body'+i}" name="body${i}" ${story.Body[i].Text}</input></li>`;
+                chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><textarea type="text" id="${'body'+i}" class="body" name="body${i}"> ${story.Body[i].Text}</textArea></li>`;
                 jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`
             }
             res.render('editstory', {
-                chapters:chapterhtml,
-                jump_links:jumplinkhtml
+                title:story.title,
+                description:story.description,
+                chapters:story.chapterhtml,
+                jump_links:story.jumplinkhtml
             });
         } catch (e) {
             res.status(400).json({ error: e.message });

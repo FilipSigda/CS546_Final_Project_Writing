@@ -1,6 +1,6 @@
 import { stories } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
-import {getUserById} from './users.js'
+import getUserById from './users.js'
 import helpers from '../helpers.js';
 
 const checkBody = (obj) => {
@@ -262,23 +262,23 @@ const createStory = async (obj) => {
 const createComment = async (storyId, userId, body) => {
     let story = await getStoryById(storyId);
     userId = helpers.checkId(userId, "User ID");
-    
-    await getUserById();
 
-    if(story.AllowComments === false) throw new Error("Error: comments are not allowed on this post");
+    await getUserById()();
 
-    let commentObj = {UserID: userId, body: body}
+    if (story.AllowComments === false) throw new Error("Error: comments are not allowed on this post");
+
+    let commentObj = { UserID: userId, body: body }
     newComments = story.Comments
     newComments.push(commentObj)
 
     let db = await stories();
     var updatedStory = await db.findOneAndUpdate(
-        {_id: { $eq: ObjectId.createFromHexString(storyId) }},
-        {$set: {Comments: newComments}},
-        {returnDocument: 'after'}
+        { _id: { $eq: ObjectId.createFromHexString(storyId) } },
+        { $set: { Comments: newComments } },
+        { returnDocument: 'after' }
     );
 
-    if(!updatedStory) throw new Error("Story Update Failed")
+    if (!updatedStory) throw new Error("Story Update Failed")
     return story;
 }
 
@@ -322,10 +322,10 @@ const updateStory = async (id, obj, userId = null) => {
     }
 
     //validates previousStory and updates it.
-    if(obj.Previous){
+    if (obj.Previous) {
         const story = await getStoryById(obj.Previous);
 
-        if(!story.Additions.includes(id)){
+        if (!story.Additions.includes(id)) {
             story.Additions.push(id);
             obj.Additions = obj.Additions.concat(story.Additions);
         }
@@ -498,7 +498,7 @@ const searchStories = async (searchParams) => {
     // gets total results for finding search 
     const totalCount = await db.countDocuments(query);
 
-    for(let i = 0; i < searchResults.length; i++){//Puts in the correct author(s) for each story.
+    for (let i = 0; i < searchResults.length; i++) {//Puts in the correct author(s) for each story.
         searchResults[i]['Author'] = helpers.getAuthor(searchResults[i]);
     }
 
@@ -516,8 +516,8 @@ const getHighestViews = async (limit) => {
 
     try {//Limits query size if asked for.
         helpers.checkInt(limit);
-        if(!Number.isNaN(limit)){
-            highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1, 'Picture': 1}).sort({Views: -1}).limit(limit).toArray();
+        if (!Number.isNaN(limit)) {
+            highestViews = await db.find({ IsPrivate: false }).project({ '_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1, 'Picture': 1 }).sort({ Views: -1 }).limit(limit).toArray();
         }
         else {
             throw "";//Intentionally left empty.
@@ -539,15 +539,15 @@ const getMostRecent = async (limit) => {
 
     try {//Limits query size if asked for.
         helpers.checkInt(limit);
-        if(!Number.isNaN(limit)){
-            mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1, 'Picture': 1}).sort({DatePosted: -1, TimePosted: -1}).limit(limit).toArray();
+        if (!Number.isNaN(limit)) {
+            mostRecent = await db.find({ IsPrivate: false }).project({ '_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1, 'Picture': 1 }).sort({ DatePosted: -1, TimePosted: -1 }).limit(limit).toArray();
         }
         else {
             throw "";//Intentionally left empty.
         }
     }
-    catch(e){
-        mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1, 'Picture': 1}).sort({DatePosted: -1, TimePosted: -1}).toArray();
+    catch (e) {
+        mostRecent = await db.find({ IsPrivate: false }).project({ '_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1, 'Picture': 1 }).sort({ DatePosted: -1, TimePosted: -1 }).toArray();
     }
 
     for (let i = 0; i < mostRecent.length; i++) {//Puts in the correct author(s) for each story.
