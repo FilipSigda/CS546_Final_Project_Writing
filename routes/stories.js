@@ -14,7 +14,7 @@ const renderstory = async (req, res, story, error = "") => {
     }
 
     // gathering story rating and finding average rating
-    const averageRating = story.Ratings && story.Ratings.length > 0
+    const averageRating = story.Ratings && story.Ratings.length > 0 
         ? (story.Ratings.reduce((sum, rating) => sum + rating.Score, 0) / story.Ratings.length).toFixed(1)
         : 'Unrated';
 
@@ -37,9 +37,9 @@ const renderstory = async (req, res, story, error = "") => {
 
     var chapterhtml = "";
     var jumplinkhtml = "";
-    for (let i = 0; i < story.Body.length; i++) {
-        chapterhtml += `<li><h2 id="${'ch' + i}" name="Chapter ${i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</h2></li>`;
-        jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`
+    for(let i=0;i<story.Body.length;i++){
+        chapterhtml += `<li><h2 id="${'ch'+i}" name="Chapter ${i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</h2></li>`;
+        jumplinkhtml += `<li><a id='${'jl'+i}' href='#${'ch'+i}'>${story.Body[i].Title}</a></li>`
     }
 
     res.render("readstory", {
@@ -54,7 +54,6 @@ const renderstory = async (req, res, story, error = "") => {
         jump_links: xss(jumplinkhtml),
         previous: xss(story.Previous),
         loggedin: (typeof req.session.user !== "undefined"),
-        averageRating: averageRating,
         totalRatings: totalRatings
     });
 }
@@ -75,6 +74,7 @@ router.route("/")
 router.route("/search")
     .get(async (req, res) => {
         try {
+            console.log(req.query);
             // converting to proper types
             const searchParams = {
                 // Name 
@@ -140,16 +140,16 @@ router.route('/:id')
             //story read page TODO: make pretty and use handlebars
             var story = await storyData.getStoryById(xss(req.params.id));
 
-            renderstory(req, res, story);
+            renderstory(req,res,story);
         } catch (e) {
             res.status(400).json({ error: e.message });
         }
     })
-    .post(async (req, res) => {
-        try {
-            if (req.session.user) {
+    .post(async (req,res) => {
+        try{
+            if(req.session.user){
                 var user = await userData.getUserById(xss(req.session.user._id));
-
+                
                 var story = await storyData.createDefaultStory(user._id);
                 story = await storyData.getStoryById(story.insertedId.toString());
 
@@ -159,19 +159,19 @@ router.route('/:id')
                 delete story._id;
                 /*TODO validation if they are allowed to create an offshoot story here*/
 
-                var updated = await storyData.updateStory(sid.toString(), story);
+                var updated = await storyData.updateStory(sid.toString(),story);
 
-                res.redirect('/stories/' + updated._id + '/edit');
-            } else {
+                res.redirect('/stories/'+updated._id+'/edit');
+            }else{
                 res.redirect('/users/signupuser');
             }
 
-        } catch (e) {
-            res.status(400).json({ error: e.message });
+        }catch(e){
+            res.status(400).json({error:e.message});
         }
     })
     //this will be mainly used for updating subdocuments like comments and ratings
-    .patch(async (req, res) => {
+    .patch(async (req,res) => {
         try {
             if (!xss(req.session.user)) {
                 return res.status(401).json({ error: "You must be logged in to rate a story" });
@@ -179,15 +179,15 @@ router.route('/:id')
             const userId = xss(req.session.user._id);
 
             var story = await storyData.updateStory(xss(req.params.id), xss(req.body), userId);
-
+            
             // if rating was added, update the user's writing score
             if (xss(req.body.Ratings) && xss(req.body.Ratings.length) > 0) {
                 await updateUserWritingScore(story.AuthorId);
             }
 
             res.status(200).json(story);
-        } catch (e) {
-            res.status(400).json({ error: e.message });
+        } catch(e) {
+            res.status(400).json({error: e.message});
         }
     });
 
@@ -217,31 +217,31 @@ const updateUserWritingScore = async (authorId) => {
     await userData.updateUserProfile(authorId, { writingScore });
 };
 
-router.route('/:id/download')
+    router.route('/:id/download')
     .get(async (req, res) => {
         try {
-
+            
             const story = await storyData.getStoryById(xss(req.params.id));
 
-
+            
             let fileContent = `${story.Title}\n\n`;
-
-
+            
+            
             if (story.Description) {
                 fileContent += `Description: ${story.Description}\n\n`;
             }
 
-
+            
             story.Body.forEach((chapter, index) => {
                 fileContent += `Chapter ${index + 1}: ${chapter.Title}\n\n`;
                 fileContent += `${chapter.Text}\n\n`;
             });
 
-
+            
             res.setHeader('Content-Type', 'text/plain');
             res.setHeader('Content-Disposition', `attachment; filename="${story.Title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt"`);
-
-
+            
+            
             res.send(fileContent);
         } catch (e) {
             res.status(400).json({ error: e.message });
@@ -249,26 +249,21 @@ router.route('/:id/download')
     });
 
 
-router.route('/:id/edit')
+    router.route('/:id/edit')
     .get(async (req, res) => {
         try {
-
             var story = await storyData.getStoryById(xss(req.params.id));
-
             if(story.Body.length == 0){
                 story.Body.push({
                     Title:"",
                     Text:""
                 });
             }
-
             // gathering story rating and finding average rating
             const averageRating = story.Ratings && story.Ratings.length > 0
                 ? (story.Ratings.reduce((sum, rating) => sum + rating.Score, 0) / story.Ratings.length).toFixed(1)
                 : 'Unrated';
-
             const totalRatings = story.Ratings ? story.Ratings.length : 0;
-
             var authorlist = [story.AuthorId];
             if(story.GroupId){
                 var group = await groupData.getGroupById(story.GroupId);
@@ -277,7 +272,6 @@ router.route('/:id/edit')
                     //
                 }
             }
-
             var authorhtml = "";
             for (let i = 0; i < authorlist.length; i++) {
                 var authorobj = await userData.getUserById(authorlist[i]);
@@ -286,7 +280,6 @@ router.route('/:id/edit')
                     authorhtml += ', ';
                 }
             }
-
             var chapterhtml = "";
             var jumplinkhtml = "";
             for (let i = 0; i < story.Body.length; i++) {

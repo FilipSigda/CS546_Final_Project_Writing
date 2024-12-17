@@ -5,22 +5,22 @@
     <br>
     <label>
       Story Name
-      <input name="search" id="searchName" type="search">
+      <input name="name" id="searchName" type="search">
     </label>
     <br>
     <label>
       Start Date
-      <input name="search" id="searchStartDate" type="date">
+      <input name="startDate" id="searchStartDate" type="date">
     </label>
     <br>
     <label>
       End Date
-      <input name="search" id="searchEndDate" type="date">
+      <input name="endDate" id="searchEndDate" type="date">
     </label>
     <br>
     <label>
       Completion Status
-      <select name="search" id="searchStatus">
+      <select name="status" id="searchStatus">
         <option value="">Any</option>
         <option value="ongoing">Ongoing</option>
         <option value="complete">Complete</option>
@@ -30,7 +30,7 @@
     <br>
     <label>
       Exclude Status
-      <select name="search" id="searchExcludeStatus">
+      <select name="excludeStatus" id="searchExcludeStatus">
         <option value="">None</option>
         <option value="ongoing">Ongoing</option>
         <option value="complete">Complete</option>
@@ -40,37 +40,37 @@
     <br>
     <label>
       Maximum Rating
-      <input name="search" id="searchMaxRating" type="number" step="0.5" min="0" max="5">
+      <input name="maxRating" id="searchMaxRating" type="number" step="0.5" min="0" max="5">
     </label>
     <br>
     <label>
       Minimum Rating
-      <input name="search" id="searchMinRating" type="number" step="0.5" min="0" max="5">
+      <input name="minRating" id="searchMinRating" type="number" step="0.5" min="0" max="5">
     </label>
     <br>
     <label>
       Maximum Reviews
-      <input name="search" id="searchMaxReviews" type="number">
+      <input name="maxRatingCount" id="searchMaxReviews" type="number">
     </label>
     <br>
     <label>
       Minimum Reviews
-      <input name="search" id="searchMinReviews" type="number">
+      <input name="minRatingCount" id="searchMinReviews" type="number">
     </label>
     <br>
     <label>
-      Maximum Character Count
-      <input name="search" id="searchMaxChar" type="number">
+      Maximum Word Count
+      <input name="maxLength" id="searchMaxWord" type="number">
     </label>
     <br>
     <label>
-      Minimum Character Count
-      <input name="search" id="searchMinChar" type="number">
+      Minimum Word Count
+      <input name="minLength" id="searchMinWord" type="number">
     </label>
     <br>
     <label>
       Group Association
-      <select name="search" id="searchAssociation">
+      <select name="groupExclusive" id="searchAssociation">
         <option value="">Any</option>
         <option value="group">Group</option>
         <option value="individual">Individual</option>
@@ -79,12 +79,12 @@
     <br>
     <label>
       Tags (Seperate By Commas)
-      <input name="search" id="searchTags" type="search">
+      <input name="tags" id="searchTags" type="search">
     </label>
     <br>
     <label>
       Exclude Tags
-      <input name="search" id="searchExcludeTags" type="search">
+      <input name="excludeTags" id="searchExcludeTags" type="search">
     </label>
   <br>
     <button>Submit</button>
@@ -165,4 +165,4 @@
     <script src="https://code.jquery.com/jquery-3.6.4.js"
         integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
     <script src='/public/js/homepage.js'></script>
-  </main>  
+  </main>

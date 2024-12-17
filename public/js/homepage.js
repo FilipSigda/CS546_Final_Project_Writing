@@ -25,8 +25,8 @@
             minRating = $('#searchMinRating'),
             maxReviews = $('#searchMaxReviews'),
             minReviews = $('#searchMinReviews'),
-            maxChar = $('#searchMaxChar'),
-            minChar = $('#searchMinChar'),
+            maxWord = $('#searchMaxWord'),
+            minWord = $('#searchMinWord'),
             groupAssociation = $('#searchAssociation'),
             tags = $('#searchTags'),
             excludeTags = $('#searchExcludeTags');
@@ -121,20 +121,20 @@
             errors.push(e);
         }
         try{
-            checkString(maxChar.val(), "maximum characters", true);
+            checkString(maxWord.val(), "maximum words", true);
         }
         catch(e){
             errors.push(e);
         }
         try{
-            checkString(minChar.val(), "minimum characters", true);
+            checkString(minWord.val(), "minimum words", true);
         }
         catch(e){
             errors.push(e);
         }
         try{
-            if(maxChar.val() !== "" && minChar.val() > maxChar.val()){
-                throw new Error("Minimum characters must not exceed maximum characters.");
+            if(maxWord.val() !== "" && minWord.val() > maxWord.val()){
+                throw new Error("Minimum words must not exceed maximum words.");
             }
         }
         catch(e){
