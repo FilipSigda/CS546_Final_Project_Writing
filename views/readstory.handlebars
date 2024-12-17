@@ -1,7 +1,7 @@
 <article>
     <h3 class="error">{{error}}</h3>
     <h1>{{title}}</h1>
-    <img src="{{imglink}}">
+    <img src="{{imglink}}" alt="Picture of Book {{title}}">
     <h3>{{{authors}}}</h3>
     <p>description: {{description}}</p>
     <a href="{{previous}}">previous</a>
@@ -20,7 +20,11 @@
     </div>
 </article>
 
-<h3 rated:>{{averageRating}}/5</h3>
+{{#if averageRating}}
+<h3> rated:{{averageRating}}/5</h3>
+{{else}}
+<h3> Not yet rated.</h3>
+{{/if}}
 <p>{{totalRatings}} ratings</p>
 
 
