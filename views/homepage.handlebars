@@ -110,7 +110,7 @@
         <div class="storycard">
           <a href="/stories/{{_id}}">
             <h5>{{Title}}</h5>
-            <img src="{{Picture}}">
+            <img src="{{Picture}}" alt="Book Picture">
           </a>
           <h6>By: {{Author}}</h6>
           <p>
@@ -130,7 +130,7 @@
         <div class="storycard">
           <a href="/stories/{{_id}}">
             <h5>{{Title}}</h5>
-            <img src="{{Picture}}">
+            <img src="{{Picture}}" alt="Book Picture">
           </a>
           <h6>By: {{Author}}</h6>
           <p>
@@ -150,7 +150,7 @@
         <div class="storycard">
           <a href="/stories/{{_id}}">
             <h5>{{Title}}</h5>
-            <img src="{{Picture}}">
+            <img src="{{Picture}}" alt="Book Picture">
           </a>
           <h6>By: {{Author}}</h6>
           <p>
@@ -161,9 +161,12 @@
       {{/each}}
     </div>
     {{else}}
+    {{#if recentResultsList}}
+    {{else}}
     <p>
       No results found.
     </p>
+    {{/if}}
     {{/if}}
 
 
