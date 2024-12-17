@@ -1,5 +1,5 @@
 import { Router } from "express";
-import debug from "../debug.js";
+import debug from "../seed.js";
 import storyData from "../data/stories.js";
 import groupData from "../data/groups.js";
 import userData from "../data/users.js";
@@ -14,7 +14,7 @@ const renderstory = async (req, res, story, error = "") => {
     }
 
     // gathering story rating and finding average rating
-    const averageRating = story.Ratings && story.Ratings.length > 0 
+    const averageRating = story.Ratings && story.Ratings.length > 0
         ? (story.Ratings.reduce((sum, rating) => sum + rating.Score, 0) / story.Ratings.length).toFixed(1)
         : 'Unrated';
 
@@ -37,9 +37,9 @@ const renderstory = async (req, res, story, error = "") => {
 
     var chapterhtml = "";
     var jumplinkhtml = "";
-    for(let i=0;i<story.Body.length;i++){
-        chapterhtml += `<li><h2 id="${'ch'+i}" name="Chapter ${i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</li>`;
-        jumplinkhtml += `<li><a id='${'jl'+i}' href='#${'ch'+i}'>${story.Body[i].Title}</a></li>`
+    for (let i = 0; i < story.Body.length; i++) {
+        chapterhtml += `<li><h2 id="${'ch' + i}" name="Chapter ${i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</li>`;
+        jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`
     }
 
     res.render("readstory", {
@@ -62,7 +62,7 @@ router.route("/")
     //post should be used for creating stories
     .post(async (req, res) => {
         try {
-            if(req.session.user){
+            if (req.session.user) {
                 var user = await userData.getUserById(req.session.user._id);
 
                 var story = await storyData.createDefaultStory(user._id);
@@ -70,7 +70,7 @@ router.route("/")
 
                 delete res.body;
 
-                res.status(301).redirect('/stories/'+story._id+'/edit');
+                res.status(301).redirect('/stories/' + story._id + '/edit');
                 return;
             }
             res.status(301).redirect('/users/signupuser');
@@ -134,7 +134,7 @@ router.route("/search")
 
             const results = (await storyData.searchStories(searchParams)).stories;
 
-            res.render("../views/homepage", {title: "Homepage", searchResultsList: results});
+            res.render("../views/homepage", { title: "Homepage", searchResultsList: results });
         } catch (e) {
             if (e.message.startsWith('Invalid search parameters:')) {
                 res.status(400).json({ error: e.message });
@@ -151,16 +151,16 @@ router.route('/:id')
             //story read page TODO: make pretty and use handlebars
             var story = await storyData.getStoryById(xss(req.params.id));
 
-            renderstory(req,res,story);
+            renderstory(req, res, story);
         } catch (e) {
             res.status(400).json({ error: e.message });
         }
     })
-    .post(async (req,res) => {
-        try{
-            if(req.session.user){
+    .post(async (req, res) => {
+        try {
+            if (req.session.user) {
                 var user = await userData.getUserById(xss(req.session.user._id));
-                
+
                 var story = await storyData.createDefaultStory(user._id);
                 story = await storyData.getStoryById(story.insertedId.toString());
 
@@ -170,19 +170,19 @@ router.route('/:id')
                 delete story._id;
                 /*TODO validation if they are allowed to create an offshoot story here*/
 
-                var updated = await storyData.updateStory(sid.toString(),story);
+                var updated = await storyData.updateStory(sid.toString(), story);
 
-                res.redirect('/stories/'+updated._id+'/edit');
-            }else{
+                res.redirect('/stories/' + updated._id + '/edit');
+            } else {
                 res.redirect('/users/signupuser');
             }
 
-        }catch(e){
-            res.status(400).json({error:e.message});
+        } catch (e) {
+            res.status(400).json({ error: e.message });
         }
     })
     //this will be mainly used for updating subdocuments like comments and ratings
-    .patch(async (req,res) => {
+    .patch(async (req, res) => {
         try {
             if (!xss(req.session.user)) {
                 return res.status(401).json({ error: "You must be logged in to rate a story" });
@@ -190,15 +190,15 @@ router.route('/:id')
             const userId = xss(req.session.user._id);
 
             var story = await storyData.updateStory(xss(req.params.id), xss(req.body), userId);
-            
+
             // if rating was added, update the user's writing score
             if (xss(req.body.Ratings) && xss(req.body.Ratings.length) > 0) {
                 await updateUserWritingScore(story.AuthorId);
             }
 
             res.status(200).json(story);
-        } catch(e) {
-            res.status(400).json({error: e.message});
+        } catch (e) {
+            res.status(400).json({ error: e.message });
         }
     });
 
@@ -228,31 +228,31 @@ const updateUserWritingScore = async (authorId) => {
     await userData.updateUserProfile(authorId, { writingScore });
 };
 
-    router.route('/:id/download')
+router.route('/:id/download')
     .get(async (req, res) => {
         try {
-            
+
             const story = await storyData.getStoryById(xss(req.params.id));
 
-            
+
             let fileContent = `${story.Title}\n\n`;
-            
-            
+
+
             if (story.Description) {
                 fileContent += `Description: ${story.Description}\n\n`;
             }
 
-            
+
             story.Body.forEach((chapter, index) => {
                 fileContent += `Chapter ${index + 1}: ${chapter.Title}\n\n`;
                 fileContent += `${chapter.Text}\n\n`;
             });
 
-            
+
             res.setHeader('Content-Type', 'text/plain');
             res.setHeader('Content-Disposition', `attachment; filename="${story.Title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt"`);
-            
-            
+
+
             res.send(fileContent);
         } catch (e) {
             res.status(400).json({ error: e.message });
@@ -260,14 +260,14 @@ const updateUserWritingScore = async (authorId) => {
     });
 
 
-    router.route('/:id/edit')
+router.route('/:id/edit')
     .get(async (req, res) => {
         try {
             var story = await storyData.getStoryById(xss(req.params.id));
-            if(story.Body.length == 0){
+            if (story.Body.length == 0) {
                 story.Body.push({
-                    Title:"",
-                    Text:""
+                    Title: "",
+                    Text: ""
                 });
             }
             // gathering story rating and finding average rating
@@ -276,13 +276,13 @@ const updateUserWritingScore = async (authorId) => {
                 : 'Unrated';
             const totalRatings = story.Ratings ? story.Ratings.length : 0;
             var authorlist = [story.AuthorId];
-            if(story.GroupId){
-                var group = await groupData.getGroupById(story.GroupId);
-                console.log(group);
-                for(let i=0;i<group.length;i++){
-                    //todo
-                }
-            }
+            // if(story.GroupId){
+            //     var group = await groupData.getGroupById(story.GroupId);
+            //     console.log(group);
+            //     for(let i=0;i<group.length;i++){
+            //         //todo
+            //     }
+            // }
             var authorhtml = "";
             for (let i = 0; i < authorlist.length; i++) {
                 var authorobj = await userData.getUserById(authorlist[i]);
@@ -294,23 +294,73 @@ const updateUserWritingScore = async (authorId) => {
             var chapterhtml = "";
             var jumplinkhtml = "";
             for (let i = 0; i < story.Body.length; i++) {
-                chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><textarea name="body${i}" rows="10" cols="100"> ${story.Body[i].Text}</textArea></li>`;
+                chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter${i}" value=${story.Body[i].Title}></input><textarea name="body${i}" rows="10" cols="100"> ${story.Body[i].Text}</textArea></li>`;
                 jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`;
             }
 
-            console.log(chapterhtml);
             res.render('editstory', {
-                title:story.title,
-                description:story.description,
-                chapters:chapterhtml,
-                jump_links:jumplinkhtml
+                title: story.title,
+                description: story.description,
+                chapters: chapterhtml,
+                jump_links: jumplinkhtml,
+                reqid: req.params.id
             });
         } catch (e) {
             res.status(400).json({ error: e.message });
         }
     })
-    .post(async (req,res) => {
-        
+    .post(async (req, res) => {
+        console.log(req.body);
+
+        // helpers.checkString(req.body.Title);
+
+        // var title = req.body.Title.trim();
+        // var description = req.body.Title.description();
+
+
+
+        var story = await storyData.getStoryById(xss(req.params.id));
+        if (story.Body.length == 0) {
+            story.Body.push({
+                Title: "",
+                Text: ""
+            });
+        }
+        // gathering story rating and finding average rating
+        const averageRating = story.Ratings && story.Ratings.length > 0
+            ? (story.Ratings.reduce((sum, rating) => sum + rating.Score, 0) / story.Ratings.length).toFixed(1)
+            : 'Unrated';
+        const totalRatings = story.Ratings ? story.Ratings.length : 0;
+        var authorlist = [story.AuthorId];
+        // if(story.GroupId){
+        //     var group = await groupData.getGroupById(story.GroupId);
+        //     console.log(group);
+        //     for(let i=0;i<group.length;i++){
+        //         //todo
+        //     }
+        // }
+        var authorhtml = "";
+        for (let i = 0; i < authorlist.length; i++) {
+            var authorobj = await userData.getUserById(authorlist[i]);
+            authorhtml += `<a href='/users/${authorobj._id}'>${authorobj.Username}</a>`
+            if (i < authorlist.length - 1) {
+                authorhtml += ', ';
+            }
+        }
+        var chapterhtml = "";
+        var jumplinkhtml = "";
+        for (let i = 0; i < story.Body.length; i++) {
+            chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><textarea name="body${i}" rows="10" cols="100"> ${story.Body[i].Text}</textArea></li>`;
+            jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`;
+        }
+
+        res.render('editstory', {
+            title: story.title,
+            description: story.description,
+            chapters: chapterhtml,
+            jump_links: jumplinkhtml,
+            reqid: req.params.id
+        });
     });
 
 export default router;

@@ -25,7 +25,7 @@ var templatestory = {
             }
         ],
     "Description": "This is a sample description meant to give a proper example of the story to finish everything",
-    "AuthorId": "675f38bcee612b11ba467935",
+    "AuthorId": "",
     "GroupId": "",
     "Previous": "n/a",
     "IsAnonymous": false,
@@ -85,7 +85,12 @@ var templatestory = {
 
 //populates mongodb with dummy stories
 const populateStories = async () => {
+    templatestory.AuthorId = await users.getUserByName("johndoe")._id.toHexString();
     var story = await stories.createStory(templatestory);
+    var dupe = templatestory;
+    dupe.AuthorId = await users.getUserByName("testuser2")._id.toHexString();
+    dupe.Title = "An alternate title";
+    var story = await stories.createStory(dupe);
     return story.insertedId;
 }
 
@@ -93,14 +98,14 @@ const populateStories = async () => {
 const populateGroups = async () => {
     try {
         // test users
-        const user1 = await users.createUser("testuser1", "Password123!");
-        const user2 = await users.createUser("testuser2", "Password456!");
-        const user3 = await users.createUser("testuser3", "Password789!");
+        const user1 = await users.createUser("johndoe", "theBestTractor");
+        const user2 = await users.createUser("testuser2", "admin");
+        const user3 = await users.createUser("amyhear", "zoom!");
 
         // test groups
         const group1 = await groups.createGroup(
-            "Test Writing Group",
-            "A group for testing writing features",
+            "Writing Group",
+            "A fanatics of writing",
             [user1._id, user2._id]
         );
 
@@ -109,38 +114,6 @@ const populateGroups = async () => {
             "Passionate about fictional storytelling",
             [user2._id, user3._id]
         );
-
-        // group retrieval
-        const retrievedGroup1 = await groups.getGroupById(group1._id);
-        console.log("Retrieved Group 1:", retrievedGroup1);
-
-        const retrievedGroupByName = await groups.getGroupByName("Fiction Enthusiasts");
-        console.log("Retrieved Group by Name:", retrievedGroupByName);
-
-        // group update
-        const updatedGroup = await groups.updateGroup(group1._id, {
-            Name: "Updated Writing Group",
-            Bio: "An improved group for collaborative writing",
-            Members: [user1._id, user2._id, user3._id]
-        });
-        console.log("Updated Group:", updatedGroup);
-
-        // getting all groups
-        const allGroups = await groups.getAllGroups();
-        console.log("All Groups:", allGroups);
-
-        // group deletion (uncomment to test)
-        // const deletedGroup = await groups.deleteGroup(group2._id);
-        // console.log("Deleted Group:", deletedGroup);
-
-        return {
-            user1,
-            user2,
-            user3,
-            group1,
-            group2,
-            updatedGroup
-        };
 
     } catch (error) {
         console.error("Error in populating groups:", error);
