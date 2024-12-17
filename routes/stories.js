@@ -262,6 +262,8 @@ router.route('/:id/download')
 
 router.route('/:id/edit')
     .get(async (req, res) => {
+
+        res.redirect('/stories/'+req.params.id);
         try {
             var story = await storyData.getStoryById(xss(req.params.id));
             if (story.Body.length == 0) {
@@ -311,9 +313,10 @@ router.route('/:id/edit')
     })
     .post(async (req, res) => {
         try {
+            xss(req.body.Title);
             console.log(req.body);
 
-            helpers.checkString(xss(req.body.Title), "Title", true);
+            helpers.checkString(xss(req.body.Title), "Title",true);
             helpers.checkString(xss(req.body.Description), "Description", true);
 
             var title = req.body.Title.trim();

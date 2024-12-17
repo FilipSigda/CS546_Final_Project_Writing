@@ -42,7 +42,7 @@ export const checkString = (strVal, varName, allowEmpty=false) => {
     checkNull(strVal,varName); 
     if (typeof strVal !== 'string') throw new Error(`Error: ${varName} must be a string!`);
     strVal = strVal.trim();
-    if (strVal.length === 0 && !allowEmpty)
+    if (strVal.length === 0)
         throw new Error(`Error: ${varName} is empty when it shouldn't be`);
     return strVal;
 }
