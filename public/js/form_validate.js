@@ -1,6 +1,7 @@
 (function ($) {
     let signInForm = $('#signin-form'),
-        signUpForm = $('#signup-form');
+        signUpForm = $('#signup-form'),
+        editProfileForm = $('#editProfileForm');
 
     function checkString (strVal, varName, allowEmpty=false) {
         if (typeof strVal === "undefined") {//we're using typeof since false === undefined. This avoids that.
@@ -150,6 +151,22 @@
         } 
     });
 
+    editProfileForm.submit(function (event){
+        let error = $('#editError'),
+            bioElem = $('#bio'),
+            pfpElem = $('#profilePicture');
 
+        error.hide();
+        let errors = [];
+
+        let bio = bioElem.val(),
+            pfp = pfpElem.val();
+
+        try{
+            
+        } catch(e){
+
+        }
+    })
 
 })(window.jQuery);

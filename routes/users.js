@@ -183,7 +183,7 @@ router
 
     // Ensure user can only edit their own profile
     if (xss(req.params.id) !== xss(req.session.user._id)) {
-        throw new Error("You are not authorized to edit this profile");
+        return res.redirect('/users/' + req.params.id)
     }
     
     try {
@@ -193,7 +193,7 @@ router
             user: user
         });
     } catch (e) {
-        throw new Error("The user profile could not be found");
+        return res.redirect('/users/' + req.params.id);
     }
 })
 .post(upload.single('profilePicture'), async (req, res) => {
@@ -204,7 +204,7 @@ router
 
     // Ensure user can only edit their own profile
     if (xss(req.params.id) !== xss(req.session.user._id)) {
-        throw new Error("You are not authorized to edit this profile");
+        return res.redirect('/users/' + req.params.id);
     }
 
     try {
@@ -232,8 +232,8 @@ router
             }
         }
 
-        throw new Error("upload failed");
-
+        res.status(400).render("/users/editprofile/" + req.params.id, {error: "upload failed"})
+        return;
     }
 });
 

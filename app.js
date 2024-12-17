@@ -88,16 +88,6 @@ app.use('/users/signoutuser', (req, res, next) => {
      }
 });
 
-//Prevent users who aren't signed in from editing a profile
-//Prevents signed in users from editing profiles that aren't their own
-app.use('/users/editprofile/:id', (req, res, next) => {
-     if((req.method === "GET") && (req.originalUrl === '/users/editprofile/' + req.params.id)){
-          if(!req.session.user) res.redirect('/users/' + req.params.id);
-          else if(req.session.user._id === req.params.id) next();
-          else res.redirect('/users/' + req.params.id);
-
-     }
-});
 configRoutes(app);
 
 app.listen(3000,() =>{

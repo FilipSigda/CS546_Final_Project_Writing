@@ -2,10 +2,10 @@
   <h4>Edit Profile</h4>
   
   {{#if error}}
-    <div class="error-message">{{error}}</div>
+    <div class="error">{{error}}</div>
   {{/if}}
   
-  <form action="/users/editprofile/{{user._id}}" method="POST" enctype="multipart/form-data">
+  <form id="editProfileForm" action="/users/editprofile/{{user._id}}" method="POST" enctype="multipart/form-data">
     <div class="form-group">
       <label for="bio">Bio</label>
       <textarea id="bio" name="bio" rows="4" maxlength="500">{{user.Bio}}</textarea>
@@ -21,4 +21,6 @@
     
     <button type="submit">Save Changes</button>
   </form>
+
+  <div id="editError" class="error" hidden>I'm an error passed down through Client-Side JS.</div>
 </div>
