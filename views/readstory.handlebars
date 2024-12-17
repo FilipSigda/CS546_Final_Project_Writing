@@ -1,5 +1,7 @@
 <article>
+    {{#if error}}
     <h3 class="error">{{error}}</h3>
+    {{/if}}
     <h1>{{title}}</h1>
     <img src="{{imglink}}" alt="Picture of Book {{title}}">
     <h3>{{{authors}}}</h3>

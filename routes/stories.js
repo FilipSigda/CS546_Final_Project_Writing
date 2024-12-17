@@ -38,7 +38,7 @@ const renderstory = async (req, res, story, error = "") => {
     var chapterhtml = "";
     var jumplinkhtml = "";
     for(let i=0;i<story.Body.length;i++){
-        chapterhtml += `<li><h2 id="${'ch'+i}" name="Chapter ${i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</h2></li>`;
+        chapterhtml += `<li><h2 id="${'ch'+i}" name="Chapter ${i}">${story.Body[i].Title}</h2><p>${story.Body[i].Text}</li>`;
         jumplinkhtml += `<li><a id='${'jl'+i}' href='#${'ch'+i}'>${story.Body[i].Title}</a></li>`
     }
 
