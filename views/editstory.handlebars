@@ -1,7 +1,17 @@
 <section>
     <form id="StoryEditor">
-    <ol>   
-        {{chapterList}}
-    </ol>
-</form>
+        <div>
+            <div id="jumplinks" class="fixed">
+                Table of Contents
+                <ol>
+                    {{{jump_links}}}
+                </ol>
+            </div>
+            <div>
+                <ol>
+                    {{{chapters}}}
+                </ol>
+            </div>
+        </div>
+    </form>
 </section>

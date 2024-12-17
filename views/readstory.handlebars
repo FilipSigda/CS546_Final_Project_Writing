@@ -13,12 +13,16 @@
             </ol>
         </div>
         <div>
-            <ol>
+            <ul>
                 {{{chapters}}}
-            </ol>
+            </ul>
         </div>
     </div>
 </article>
+
+<h3 rated:>{{averageRating}}/5</h3>
+<p>{{totalRatings}} ratings</p>
+
 
 {{#if loggedin}}
 <form id="createAddition" method="POST" action="/stories/{{urlid}}">
