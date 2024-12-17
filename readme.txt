@@ -17,4 +17,6 @@ You are now on our homepage, which automatically displays a couple stories.  Fro
     Click on a story to read it.
     Navigate chapters by clicking on their links in the table of contents.
 -Making a story:
-    ???
+    Click on the Write button on the homepage after signing in.
+    Create a title and write your chapters.
+    Save your story.
