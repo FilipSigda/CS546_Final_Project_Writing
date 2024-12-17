@@ -146,21 +146,22 @@ router.route('/:id')
     .post(async (req,res) => {
         try{
             if(req.session.user){
-                var user = await userData.getUserById(xss(req.session.user));
+                var user = await userData.getUserById(xss(req.session.user._id));
                 
                 var story = await storyData.createDefaultStory(user._id);
-                story.Previous = xss(req.params.id);
-                var sid = story._id;
+                story = await storyData.getStoryById(story.insertedId.toString());
 
+                story.Previous = xss(req.params.id);
+
+                const sid = story._id;
                 delete story._id;
                 /*TODO validation if they are allowed to create an offshoot story here*/
 
-                var updated = await storyData.updateStory(sid,story);
-                console.log(updated);
+                var updated = await storyData.updateStory(sid.toString(),story);
 
-                res.redirect('stories/'+story._id+'/edit');
+                res.redirect('/stories/'+updated._id+'/edit');
             }else{
-                res.redirect('users/signupuser');
+                res.redirect('/users/signupuser');
             }
 
         }catch(e){
@@ -249,7 +250,7 @@ const updateUserWritingScore = async (authorId) => {
     router.route('/:id/edit')
     .get(async (req,res) =>{
         try{
-            res.status(400).json("created");
+            res.render('editstory',{});
         }catch(e){
             res.status(400).json({error: e.message});
         }

@@ -9,8 +9,8 @@ img.profilePicture{
 }
 
 .error{
-    color:red;
-    background-color: salmon;
+    color:salmon;
+    background-color: gray;
 }
 .user-profile h2{
     display: inline;

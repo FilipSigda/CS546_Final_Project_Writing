@@ -15,7 +15,7 @@ const checkTag = (str) => {
 const checkRating = (obj) => {
     helpers.checkObj(obj);
     obj.UserId = helpers.checkId(obj.UserId, "Rating");
-    
+
     // validate rating score is between 0 and 10
     const score = helpers.checkNumber(obj.Score, "Rating Score");
     if (score < 0 || score > 10) {
@@ -86,8 +86,12 @@ const checkStatus = (str) => {
 //checks settings subdocument
 const checkSettings = (obj) => {
     obj.MaxParticipants = helpers.checkInt(50, "MaxParticipants");
-    helpers.checkId.apply(null, obj.AllowedParticipants);
-    helpers.checkId.apply(null, obj.AllowedGroups);
+    if (obj.AllowedParticipants.length > 0) {
+        helpers.checkId.apply(null, obj.AllowedParticipants);
+    }
+    if (obj.AllowedGroups.length > 0) {
+        helpers.checkId.apply(null, obj.AllowedGroups);
+    }
     obj.MaxSentences = helpers.checkInt(obj.MaxSentences, "MaxSentences");
     obj.MinWords = helpers.checkInt(obj.MinWords, "MinWords");
     obj.MaxWords = helpers.checkInt(obj.MaxWords, "MaxWords");
@@ -232,17 +236,18 @@ const createStory = async (obj) => {
 
     var db = await stories();
     var prevstory = null;
-    try{
-    if(obj.Previous != "n/a"){
-        prevstory = await getStoryById(obj.Previous);
-    }}catch(e){
+    try {
+        if (obj.Previous != "n/a") {
+            prevstory = await getStoryById(obj.Previous);
+        }
+    } catch (e) {
         throw new Error("Previous story does not exist");
     }
     var story = await db.insertOne(obj);
 
-    if(prevstory != null){
-        prevstory.Additions.append(story._id); 
-        await updateStory(prevstory._id,{Additions:prevstory.Additions});
+    if (prevstory != null) {
+        prevstory.Additions.append(story._id);
+        await updateStory(prevstory._id, { Additions: prevstory.Additions });
     }
 
     if (!story.acknowledged) {
@@ -276,11 +281,11 @@ const updateStory = async (id, obj, userId = null) => {
     // handling ratings
     if (obj.Ratings) {
         const story = await getStoryById(id);
-        
+
         // check for rating update
         if (obj.Ratings.length > 0) {
             const newRating = obj.Ratings[0];
-            
+
             // validate rating
             checkRating(newRating);
 
@@ -288,6 +293,16 @@ const updateStory = async (id, obj, userId = null) => {
             if (hasUserRatedStory(story, newRating.UserId)) {
                 throw new Error("You can only rate a story once");
             }
+        }
+    }
+
+    //validates previousStory and updates it.
+    if(obj.Previous){
+        const story = await getStoryById(obj.Previous);
+
+        if(!story.Additions.includes(id)){
+            story.Additions.push(id);
+            obj.Additions = obj.Additions.concat(story.Additions);
         }
     }
 
@@ -358,13 +373,13 @@ const searchStories = async (searchParams) => {
         query.$expr = {};
         if (searchParams.minRating) {
             query.$expr.$gte = [
-                { $avg: "$Ratings.Score" }, 
+                { $avg: "$Ratings.Score" },
                 searchParams.minRating
             ];
         }
         if (searchParams.maxRating) {
             query.$expr.$lte = [
-                { $avg: "$Ratings.Score" }, 
+                { $avg: "$Ratings.Score" },
                 searchParams.maxRating
             ];
         }
@@ -374,7 +389,7 @@ const searchStories = async (searchParams) => {
     if (searchParams.minRatingCount) {
         query.$expr = query.$expr || {};
         query.$expr.$gte = [
-            { $size: "$Ratings" }, 
+            { $size: "$Ratings" },
             searchParams.minRatingCount
         ];
     }
@@ -395,14 +410,16 @@ const searchStories = async (searchParams) => {
     // length (based on total words)
     if (searchParams.minLength || searchParams.maxLength) {
         query.$expr = query.$expr || {};
-        const bodyLengthCalculation = { 
-            $reduce: { 
-                input: "$Body", 
-                initialValue: 0, 
-                in: { $add: [
-                    "$$value", 
-                    { $size: { $split: ["$$this.Text", " "] } }
-                ]}
+        const bodyLengthCalculation = {
+            $reduce: {
+                input: "$Body",
+                initialValue: 0,
+                in: {
+                    $add: [
+                        "$$value",
+                        { $size: { $split: ["$$this.Text", " "] } }
+                    ]
+                }
             }
         };
 
@@ -416,14 +433,14 @@ const searchStories = async (searchParams) => {
 
     // story pictures and descriptions
     if (searchParams.hasPicture !== undefined) {
-        query.Picture = searchParams.hasPicture 
-            ? { $ne: helpers.getDefaultImage() } 
+        query.Picture = searchParams.hasPicture
+            ? { $ne: helpers.getDefaultImage() }
             : helpers.getDefaultImage();
     }
     if (searchParams.descriptionKeyword) {
-        query.Description = { 
-            $regex: searchParams.descriptionKeyword, 
-            $options: 'i' 
+        query.Description = {
+            $regex: searchParams.descriptionKeyword,
+            $options: 'i'
         };
     }
 
@@ -459,20 +476,19 @@ const getHighestViews = async (limit) => {
     const db = await stories();
     let highestViews;
 
-    try{//Limits query size if asked for.
+    try {//Limits query size if asked for.
         helpers.checkInt(limit);
         if(!Number.isNaN(limit)){
             highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1, 'Picture': 1}).sort({Views: -1}).limit(limit).toArray();
         }
-        else{
+        else {
             throw "";//Intentionally left empty.
         }
     }
-    catch(e){
-        highestViews = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1, 'Picture': 1}).sort({Views: -1}).toArray();
+    catch (e) {
+        highestViews = await db.find({ IsPrivate: false }).project({ '_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'Views': 1 }).sort({ Views: -1 }).toArray();
     }
-
-    for(let i = 0; i < highestViews.length; i++){//Puts in the correct author(s) for each story.
+    for (let i = 0; i < highestViews.length; i++) {//Puts in the correct author(s) for each story.
         highestViews[i]['Author'] = helpers.getAuthor(highestViews[i]);
     }
 
@@ -483,12 +499,12 @@ const getMostRecent = async (limit) => {
     const db = await stories();
     let mostRecent;
 
-    try{//Limits query size if asked for.
+    try {//Limits query size if asked for.
         helpers.checkInt(limit);
         if(!Number.isNaN(limit)){
             mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1, 'Picture': 1}).sort({DatePosted: -1, TimePosted: -1}).limit(limit).toArray();
         }
-        else{
+        else {
             throw "";//Intentionally left empty.
         }
     }
@@ -496,11 +512,11 @@ const getMostRecent = async (limit) => {
         mostRecent = await db.find({IsPrivate: false}).project({'_id': 1, 'Title': 1, 'Description': 1, 'AuthorId': 1, 'GroupId': 1, 'IsAnonymous': 1, 'IsPrivate': 1, 'DatePosted': 1, 'TimePosted': 1, 'Picture': 1}).sort({DatePosted: -1, TimePosted: -1}).toArray();
     }
 
-    for(let i = 0; i < mostRecent.length; i++){//Puts in the correct author(s) for each story.
+    for (let i = 0; i < mostRecent.length; i++) {//Puts in the correct author(s) for each story.
         mostRecent[i]['Author'] = helpers.getAuthor(mostRecent[i]);
     }
 
     return mostRecent;
 };
 
-export default { createStory, getStoryById, getAllStories, updateStory, deleteStory, createDefaultStory, searchStories, getHighestViews, getMostRecent};
+export default { createStory, getStoryById, getAllStories, updateStory, deleteStory, createDefaultStory, searchStories, getHighestViews, getMostRecent };
