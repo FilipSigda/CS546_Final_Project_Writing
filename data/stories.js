@@ -463,6 +463,11 @@ const searchStories = async (searchParams) => {
 
     // gets total results for finding search 
     const totalCount = await db.countDocuments(query);
+    console.log(searchResults);
+
+    for(let i = 0; i < searchResults.length; i++){//Puts in the correct author(s) for each story.
+        searchResults[i]['Author'] = helpers.getAuthor(searchResults[i]);
+    }
 
     return {
         stories: searchResults,

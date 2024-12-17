@@ -162,48 +162,7 @@
             errors.push(e);
         }
 
-        console.log(errors);
-
-        if(errors.length === 0){
-            // converting to proper types
-            const searchParams = {
-                // Name 
-                name: xss(name.val()),
-                excludeName: xss(excludeName.val()),
-
-                // Date 
-                startDate: xss(startDate.val()),
-                endDate: xss(endDate.val()),
-
-                // Status (complete, hiatus, dropped)
-                status: xss(status.val()),
-                excludeStatus: xss(excludeStatus.val()),
-
-                // Ratings
-                minRating: xss(minRating.val()) ? parseFloat(xss(minRating.val())) : undefined,
-                maxRating: xss(maxRating.val()) ? parseFloat(xss(maxRating.val())) : undefined,
-                minRatingCount: xss(minRatingCount.val()) ? parseInt(xss(minRatingCount.val())) : undefined,
-
-                // Group exclusive?
-                groupExclusive: xss(groupAssociation.val()) === 'true',
-
-                // Tags
-                tags: xss(tags.val()) ? xss(tags.val()).split(',') : undefined,
-                excludeTags: xss(excludeTags.val()) ? xss(excludeTags.val()).split(',') : undefined,
-
-                // Length
-                minLength: xss(minLength.val()) ? parseInt(xss(minLength.val())) : undefined,
-                maxLength: xss(maxLength.val()) ? parseInt(xss(maxLength.val())) : undefined,
-            };
-
-            // Remove undefined values
-            Object.keys(searchParams).forEach(key =>
-                searchParams[key] === undefined && delete searchParams[key]
-            );
-
-            //const results = await storyData.searchStories(searchParams);
-        }
-        else{
+        if(errors.length !== 0){
             event.preventDefault();
             errorReport.show();
 

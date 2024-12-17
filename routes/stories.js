@@ -120,8 +120,9 @@ router.route("/search")
                 searchParams[key] === undefined && delete searchParams[key]
             );
 
-            const results = await storyData.searchStories(searchParams);
-            res.status(200).json(results);
+            const results = (await storyData.searchStories(searchParams)).stories;
+
+            res.render("../views/homepage", {title: "Homepage", searchResultsList: results});
         } catch (e) {
             if (e.message.startsWith('Invalid search parameters:')) {
                 res.status(400).json({ error: e.message });

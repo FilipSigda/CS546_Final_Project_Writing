@@ -97,8 +97,8 @@
   <br>
 
   <main>
-    <h4>Most Viewed:</h4>
     {{#if viewedResultsList}}
+    <h4>Most Viewed:</h4>
     <div class="feed">
       {{#each viewedResultsList}}
         <div class="storycard">
@@ -114,15 +114,11 @@
         </div>
       {{/each}}
     </div>
-    {{else}}
-    <p>
-      No results found.
-    </p>
     {{/if}}
     <br>
     <br>
-    <h4>Most Recent:</h4>
     {{#if recentResultsList}}
+    <h4>Most Recent:</h4>
     <div class="feed">
       {{#each recentResultsList}}
         <div class="storycard">
@@ -139,11 +135,32 @@
         </div>
       {{/each}}
     </div>
-    {{else}}
-      <p>
-        No results found.
-      </p>
     {{/if}}
+
+    {{#if searchResultsList}}
+    <h4>Search Results:</h4>
+    <div>
+      {{#each searchResultsList}}
+        <div class="storycard">
+          <a href="/stories/{{_id}}">
+            <h5>{{Title}}</h5>
+            <img src="{{Picture}}">
+          </a>
+          <h6>By: {{Author}}</h6>
+          <p>
+            {{Description}}
+          </p>
+        </div>
+      {{/each}}
+    </div>
+    {{else}}
+    <p>
+      No results found.
+    </p>
+    {{/if}}
+
+
+
     <script src="https://code.jquery.com/jquery-3.6.4.js"
         integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
     <script src='/public/js/homepage.js'></script>
