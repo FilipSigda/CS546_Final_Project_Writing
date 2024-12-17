@@ -44,3 +44,74 @@ img{
     width:fit-content;
     height: fit-content;
 }
+
+
+div.error{
+    color: red;
+    background-color: salmon;
+}
+
+img.profilePicture{
+    height: 25px;
+    width: 25px;
+}
+
+img{
+    max-height: 100px;
+    max-width: 100px;
+}
+
+.error{
+    color:salmon;
+    background-color: gray;
+}
+.user-profile h2{
+    display: inline;
+}
+
+.user-profile .pfp{
+    height: 75px;
+    width: 75px;
+}
+
+.storycard{
+    width: 20%;
+    padding: 0.5%;
+    background-color: lightblue;
+}
+
+.feed{
+    width: 100%;
+    padding: 0.5%;
+    display: flex;
+    flex-direction: row;
+    gap:5%;
+}
+
+h2 {
+    font-weight: bold;
+}
+
+h4 {
+    font-weight: bold;
+}
+
+h5 {
+    font-weight: bold;
+}
+
+h6 {
+    font-weight: bold;
+}
+
+footer {
+    text-decoration: underline;
+}
+
+button {
+    background-color: aqua;
+}
+
+header {
+    background-color: beige;
+}
