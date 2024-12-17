@@ -310,57 +310,70 @@ router.route('/:id/edit')
         }
     })
     .post(async (req, res) => {
-        console.log(req.body);
+        try {
+            console.log(req.body);
 
-        // helpers.checkString(req.body.Title);
+            helpers.checkString(xss(req.body.Title), "Title", true);
+            helpers.checkString(xss(req.body.Description), "Description", true);
 
-        // var title = req.body.Title.trim();
-        // var description = req.body.Title.description();
+            var title = req.body.Title.trim();
+            var description = req.body.Description.trim();
 
+            var body = [];
+            for (let i = 0; i < 1000; i++) {
+                if (typeof req.body["ch" + i] === "undefined") {
+                    break;
+                }
+                helpers.checkString(xss(req.body["ch" + i]), "Chapter " + i, true);
+                helpers.checkString(xss(req.body["body" + i]), "Body " + i, true);
+                console.log(req.body["body" + i]);
 
-
-        var story = await storyData.getStoryById(xss(req.params.id));
-        if (story.Body.length == 0) {
-            story.Body.push({
-                Title: "",
-                Text: ""
-            });
-        }
-        // gathering story rating and finding average rating
-        const averageRating = story.Ratings && story.Ratings.length > 0
-            ? (story.Ratings.reduce((sum, rating) => sum + rating.Score, 0) / story.Ratings.length).toFixed(1)
-            : 'Unrated';
-        const totalRatings = story.Ratings ? story.Ratings.length : 0;
-        var authorlist = [story.AuthorId];
-        // if(story.GroupId){
-        //     var group = await groupData.getGroupById(story.GroupId);
-        //     console.log(group);
-        //     for(let i=0;i<group.length;i++){
-        //         //todo
-        //     }
-        // }
-        var authorhtml = "";
-        for (let i = 0; i < authorlist.length; i++) {
-            var authorobj = await userData.getUserById(authorlist[i]);
-            authorhtml += `<a href='/users/${authorobj._id}'>${authorobj.Username}</a>`
-            if (i < authorlist.length - 1) {
-                authorhtml += ', ';
             }
-        }
-        var chapterhtml = "";
-        var jumplinkhtml = "";
-        for (let i = 0; i < story.Body.length; i++) {
-            chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><textarea name="body${i}" rows="10" cols="100"> ${story.Body[i].Text}</textArea></li>`;
-            jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`;
-        }
 
-        res.render('editstory', {
-            title: story.title,
-            description: story.description,
-            chapters: chapterhtml,
-            jump_links: jumplinkhtml,
-            reqid: req.params.id
-        });
+            await storyData.updateStory(xss(req.params.id), {
+                Title: title,
+                Description: description,
+                Body: body
+            });
+
+            var story = await storyData.getStoryById(xss(req.params.id));
+            if (story.Body.length == 0) {
+                story.Body.push({
+                    Title: "",
+                    Text: ""
+                });
+            }
+            // gathering story rating and finding average rating
+            const averageRating = story.Ratings && story.Ratings.length > 0
+                ? (story.Ratings.reduce((sum, rating) => sum + rating.Score, 0) / story.Ratings.length).toFixed(1)
+                : 'Unrated';
+            const totalRatings = story.Ratings ? story.Ratings.length : 0;
+            var authorlist = [story.AuthorId];
+            var authorhtml = "";
+            for (let i = 0; i < authorlist.length; i++) {
+                var authorobj = await userData.getUserById(authorlist[i]);
+                authorhtml += `<a href='/users/${authorobj._id}'>${authorobj.Username}</a>`
+                if (i < authorlist.length - 1) {
+                    authorhtml += ', ';
+                }
+            }
+            var chapterhtml = "";
+            var jumplinkhtml = "";
+            for (let i = 0; i < story.Body.length; i++) {
+                chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><textarea name="body${i}" rows="10" cols="100"> ${story.Body[i].Text}</textArea></li>`;
+                jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`;
+            }
+
+            res.render('editstory', {
+                title: story.title,
+                description: story.description,
+                chapters: chapterhtml,
+                jump_links: jumplinkhtml,
+                reqid: req.params.id
+            });
+        } catch (e) {
+            res.status(400).json({ error: e.message });
+        }
     });
 
 export default router;
