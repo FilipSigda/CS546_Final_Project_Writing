@@ -163,9 +163,31 @@
             pfp = pfpElem.val();
 
         try{
-            
+            bio = checkString(bio, "Bio", true);
+            if (bio.length > 500) throw new Error("Bio cannot exceed 500 characters");
         } catch(e){
+            errors.push(e.message)
+        }
 
+        try{
+            pfp = checkString(pfp, "Profile Picture", true);
+        } catch(e){
+            errors.push(e.message);
+        }
+
+        if(errors.length >= 1){
+            event.preventDefault();
+            error.empty();
+            error.show();
+
+            let myUl = $(`<ul></ul>`);
+
+            for (let x of errors){
+                let element = $(`<li>${x}</li>`)
+                myUl.append(element);
+            }
+
+            error.append(myUl);
         }
     })
 

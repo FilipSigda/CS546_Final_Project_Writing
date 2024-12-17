@@ -215,7 +215,7 @@ router
         // profile picture upload
         if (xss(req.file)) {
             // constructs path
-            updateData.profilePicture = `/uploads/profile-pictures/${xss(req.file.filename)}`;
+            updateData.profilePicture = `/public/uploads/profile-pictures/${xss(req.file.filename)}`;
         }
 
         const updatedUser = await userData.updateUserProfile(xss(req.params.id), updateData);
