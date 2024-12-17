@@ -5,16 +5,20 @@
         <div>
             <div id="jumplinks" class="fixed">
                 Table of Contents
-                <ol>
+                <ol id="linkList">
                     {{{jump_links}}}
                 </ol>
             </div>
             <div>
-                <ol>
+                <ol id="chapterList">
                     {{{chapters}}}
                 </ol>
-                <form id="addchapter" name="addchapter"><input type="submit" value="Add Chapter"/></form>
             </div>
+            <button id="addchapter" name="addchapter">Add Chapter</button>
         </div>
+        <input type="submit" value="Save story">
     </form>
+    <script src="https://code.jquery.com/jquery-3.6.4.js"
+        integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+    <script src='/public/js/addchapter.js'></script>
 </section>

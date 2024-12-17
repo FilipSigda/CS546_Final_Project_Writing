@@ -294,20 +294,23 @@ const updateUserWritingScore = async (authorId) => {
             var chapterhtml = "";
             var jumplinkhtml = "";
             for (let i = 0; i < story.Body.length; i++) {
-                chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><textarea type="text" id="${'body'+i}" class="body" name="body${i}"> ${story.Body[i].Text}</textArea></li>`;
+                chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><textarea name="body${i}" rows="10" cols="100"> ${story.Body[i].Text}</textArea></li>`;
                 jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`;
             }
 
-            console.log(story.Body.length);
+            console.log(chapterhtml);
             res.render('editstory', {
                 title:story.title,
                 description:story.description,
-                chapters:story.chapterhtml,
-                jump_links:story.jumplinkhtml
+                chapters:chapterhtml,
+                jump_links:jumplinkhtml
             });
         } catch (e) {
             res.status(400).json({ error: e.message });
         }
+    })
+    .post(async (req,res) => {
+        
     });
 
 export default router;
