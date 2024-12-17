@@ -263,7 +263,7 @@ const createComment = async (storyId, userId, body) => {
     let story = await getStoryById(storyId);
     userId = helpers.checkId(userId, "User ID");
     
-    await getUserById;
+    await getUserById();
 
     if(story.AllowComments === false) throw new Error("Error: comments are not allowed on this post");
 
