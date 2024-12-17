@@ -22,9 +22,9 @@
       Completion Status
       <select name="search" id="searchStatus">
         <option value="">Any</option>
-        <option value="Ongoing">Ongoing</option>
-        <option value="Complete">Complete</option>
-        <option value="Dropped">Dropped</option>
+        <option value="ongoing">Ongoing</option>
+        <option value="complete">Complete</option>
+        <option value="dropped">Dropped</option>
       </select>
     </label>
     <br>
@@ -32,9 +32,9 @@
       Exclude Status
       <select name="search" id="searchExcludeStatus">
         <option value="">None</option>
-        <option value="Ongoing">Ongoing</option>
-        <option value="Complete">Complete</option>
-        <option value="Dropped">Dropped</option>
+        <option value="ongoing">Ongoing</option>
+        <option value="complete">Complete</option>
+        <option value="dropped">Dropped</option>
       </select>
     </label>
     <br>
@@ -50,30 +50,30 @@
     <br>
     <label>
       Maximum Reviews
-      <input name="search" id="searchMaxReviews" type="search">
+      <input name="search" id="searchMaxReviews" type="number">
     </label>
     <br>
     <label>
       Minimum Reviews
-      <input name="search" id="searchMinReviews" type="search">
+      <input name="search" id="searchMinReviews" type="number">
     </label>
     <br>
     <label>
       Maximum Character Count
-      <input name="search" id="searchMaxChar" type="search">
+      <input name="search" id="searchMaxChar" type="number">
     </label>
     <br>
     <label>
       Minimum Character Count
-      <input name="search" id="searchMinChar" type="search">
+      <input name="search" id="searchMinChar" type="number">
     </label>
     <br>
     <label>
       Group Association
       <select name="search" id="searchAssociation">
         <option value="">Any</option>
-        <option value="Group">Group</option>
-        <option value="Individual">Individual</option>
+        <option value="group">Group</option>
+        <option value="individual">Individual</option>
       </select>
     </label>
     <br>
@@ -89,6 +89,11 @@
   <br>
     <button>Submit</button>
   </form>
+
+  <div id="searchErrors" class="error" hidden>
+      <p>Correct the following errors:</p>
+  </div>
+
   <br>
 
   <main>
@@ -139,4 +144,7 @@
         No results found.
       </p>
     {{/if}}
+    <script src="https://code.jquery.com/jquery-3.6.4.js"
+        integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+    <script src='/public/js/homepage.js'></script>
   </main>  
