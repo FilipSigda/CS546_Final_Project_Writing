@@ -183,10 +183,7 @@ router
 
     // Ensure user can only edit their own profile
     if (xss(req.params.id) !== xss(req.session.user._id)) {
-        return res.status(403).render('error', {
-            title: "Unauthorized",
-            message: "You are not authorized to edit this profile"
-        });
+        return res.redirect('/users/' + req.params.id)
     }
     
     try {
@@ -196,10 +193,7 @@ router
             user: user
         });
     } catch (e) {
-        res.status(404).render('error', {
-            title: "User Not Found",
-            message: "The user profile could not be found"
-        });
+        return res.redirect('/users/' + req.params.id);
     }
 })
 .post(upload.single('profilePicture'), async (req, res) => {
@@ -210,10 +204,7 @@ router
 
     // Ensure user can only edit their own profile
     if (xss(req.params.id) !== xss(req.session.user._id)) {
-        return res.status(403).render('error', {
-            title: "Unauthorized",
-            message: "You are not authorized to edit this profile"
-        });
+        return res.redirect('/users/' + req.params.id);
     }
 
     try {
@@ -232,7 +223,7 @@ router
         req.session.user = updatedUser;
         res.redirect('/users/' + updatedUser._id);
     } catch (e) {
-        // if update fails, delete the uploaded file and render the editprofile page again with an error message
+        // if update fails, delete the uploaded file and throw the error
         if (xss(req.file)) {
             try {
                 fs.unlinkSync(xss(req.file.path));
@@ -241,13 +232,11 @@ router
             }
         }
 
-        res.status(400).render('../views/editprofile', {
-            title: "Edit Profile", 
-            error: e.message,
-            user: xss(req.session.user)
-        });
+        res.status(400).render("/users/editprofile/" + req.params.id, {error: "upload failed"})
+        return;
     }
 });
+
 
 
 export default router;

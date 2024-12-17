@@ -36,7 +36,7 @@ const getUserById = async (id) => {
 
 //returns user with that name WITHOUT PASSWORD!!!
 const getUserByName = async (name) => {
-    name = await checkString(name, "name");
+    name = checkString(name, "name");
     
     const userCollection = await users();
     const user = await userCollection.findOne({Username: { $regex: "(?i)" + name + "(?-i)"}}, {projection: {"HashedPassword":false}});
@@ -193,9 +193,14 @@ const updateUserProfile = async (id, updateData) => {
     }
 
     if (updateData.bio !== undefined) {
+        updateData.bio = checkString(updateData.bio, "Bio", true);
         if (updateData.bio.length > 500) {
             throw new Error("Bio cannot exceed 500 characters");
         }
+        if (updateData.bio === ""){
+            updateData.bio = getDefaultBio();
+        }
+
         updateDoc.Bio = updateData.bio;
     }
 
