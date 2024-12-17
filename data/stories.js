@@ -1,5 +1,6 @@
 import { stories } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
+import {getUserById} from './users.js'
 import helpers from '../helpers.js';
 
 const checkBody = (obj) => {
@@ -256,6 +257,30 @@ const createStory = async (obj) => {
 
     return story;
 };
+
+//Creates comments
+const createComment = async (storyId, userId, body) => {
+    let story = await getStoryById(storyId);
+    userId = helpers.checkId(userId, "User ID");
+    
+    await getUserById;
+
+    if(story.AllowComments === false) throw new Error("Error: comments are not allowed on this post");
+
+    let commentObj = {UserID: userId, body: body}
+    newComments = story.Comments
+    newComments.push(commentObj)
+
+    let db = await stories();
+    var updatedStory = await db.findOneAndUpdate(
+        {_id: { $eq: ObjectId.createFromHexString(storyId) }},
+        {$set: {Comments: newComments}},
+        {returnDocument: 'after'}
+    );
+
+    if(!updatedStory) throw new Error("Story Update Failed")
+    return story;
+}
 
 const getStoryById = async (id) => {
     id = helpers.checkId(id, "id");
