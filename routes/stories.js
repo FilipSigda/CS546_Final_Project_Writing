@@ -68,9 +68,13 @@ router.route("/")
                 var story = await storyData.createDefaultStory(user._id);
                 story = await storyData.getStoryById(story.insertedId.toString());
 
-                res.redirect('/stories/'+story._id+'/edit');
+                delete res.body;
+
+                res.status(301).redirect('/stories/'+story._id+'/edit');
+                return;
             }
-            res.redirect('/users/signupuser');
+            res.status(301).redirect('/users/signupuser');
+            return;
 
         } catch (e) {
             res.status(400).json({ error: e.message });
@@ -291,8 +295,10 @@ const updateUserWritingScore = async (authorId) => {
             var jumplinkhtml = "";
             for (let i = 0; i < story.Body.length; i++) {
                 chapterhtml += `<li><input type="text" id="${'ch' + i}" name="Chapter ${i}" value=${story.Body[i].Title}></input><textarea type="text" id="${'body'+i}" class="body" name="body${i}"> ${story.Body[i].Text}</textArea></li>`;
-                jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`
+                jumplinkhtml += `<li><a id='${'jl' + i}' href='#${'ch' + i}'>${story.Body[i].Title}</a></li>`;
             }
+
+            console.log(story.Body.length);
             res.render('editstory', {
                 title:story.title,
                 description:story.description,
